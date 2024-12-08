@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MystryMenu</title>
+  <link rel="stylesheet" href="../css/recipe_view.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <h2><span class="gold">M</span>ystry<span class="gold">M</span>enu <img src="../image/logo.jpg" alt="Logo" class="logimg"></h2> 
+                <section class="related-recipes">
+                    <div class="recipe-list">
+                        <div class="recipe">
+                            <img src="../image/recipe1.jpeg" alt="Recipe 1">
+                            <a href=""><p>Recipe 1</p></a>
+                        </div>
+                        <div class="recipe">
+                            <img src="../image/recipe2.jpeg" alt="Recipe 2">
+                            <a href=""><p>Recipe 2</p></a>
+                        </div>
+                        <div class="recipe">
+                            <img src="../image/recipe3.jpeg" alt="Recipe 3">
+                            <a href=""><p>Recipe 3</p></a>
+                        </div>
+                        <div class="recipe">
+                            <img src="../image/recipe5.jpeg" alt="Recipe 3">
+                            <a href=""><p>Recipe 5</p></a>
+                        </div>
+                    </div>
+                </section>
+        
+            </div>
+        </aside>
+        <main class="main-content">
+            <header>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search">
+                    <button><i class="fas fa-search" style="color: rgb(190, 190, 190);"></i></button>
+                </div>
+                <div class="header-icons">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <br>
+            </header>
+            <div class="recipe-name">
+                <p>Recipe Name</p>
+            </div>
+            <div class="view">
+                <section class="recipe-details">
+                    <p style="font-weight: bold; font-size: 20px;">Ingredient and recipe description</p>
+                    <img src="../image/recipe4.jpeg" alt="Recipe Image">
+                    <p style="font-family: 'Times New Roman', Times, serif; font-size: 18px;">1 pound lean ground beef
+
+                        ½ cup bread crumbs
+                        
+                        3 tablespoons minced onion
+                        
+                        2 tablespoons water
+                        
+                        1 large egg
+                        
+                        1 (8 ounce) can jellied cranberry sauce
+                        
+                        ¾ cup chili sauce
+                        
+                        1 tablespoon brown sugar
+                        
+                        1 ½ teaspoons lemon juice
+
+                        Directions
+                        Gather the ingredients. Preheat the oven to 350 degrees F (175 degrees C).
+                        
+                        Mix ground beef, bread crumbs, onion, water, and egg together in a large bowl. Form into small meatballs and arrange on a nonstick baking sheet. Bake in the preheated oven for 20 to 25 minutes, turning once.
+                        
+                        Stir cranberry sauce, chili sauce, brown sugar, and lemon juice together in a large saucepan over low heat until smooth. Add meatballs; simmer for 1 hour before serving.Directions
+                        Gather the ingredients. Preheat the oven to 350 degrees F (175 degrees C).
+
+                        Mix ground beef, bread crumbs, onion, water, and egg together in a large bowl. Form into small meatballs and arrange on a nonstick baking sheet. Bake in the preheated oven for 20 to 25 minutes, turning once.
+
+                        Stir cranberry sauce, chili sauce, brown sugar, and lemon juice together in a large saucepan over low heat until smooth. Add meatballs; simmer for 1 hour before serving.Directions
+                        Gather the ingredients. Preheat the oven to 350 degrees F (175 degrees C).
+
+                        Mix ground beef, bread crumbs, onion, water, and egg together in a large bowl. Form into small meatballs and arrange on a nonstick baking sheet. Bake in the preheated oven for 20 to 25 minutes, turning once.
+
+                        Stir cranberry sauce, chili sauce, brown sugar, and lemon juice together in a large saucepan over low heat until smooth. Add meatballs; simmer for 1 hour before serving.</p>
+                    <div class="actions">
+                        <button class="heart-btn"><i class="fas fa-heart"></i></button>
+                        <script>
+                            document.querySelector('.heart-btn').addEventListener('click', function () {
+                              this.classList.toggle('clicked');
+                            });
+                        </script>
+                        <button><i class="fas fa-download download-icon"></i></button>
+                        <button><i class="fas fa-share-alt share-icon"></i></button>
+                    </div>
+                    <section class="feedback">
+                        <h3>Feedback</h3>
+                        <textarea placeholder="Add your feedback"></textarea>
+                        <br>
+                        <button>Add</button>
+                    </section>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

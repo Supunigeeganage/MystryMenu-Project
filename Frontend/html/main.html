@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MystryMenu</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <h2><span class="gold">M</span>ystry<span class="gold">M</span>enu <img src="../image/logo.jpg" alt="Logo"></h2> 
+            </div>
+            <ul class="menu">
+                <li><a href="#" class="active"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#"><i class="fas fa-utensils"></i> Breakfast</a></li>
+                <li><a href="#"><i class="fas fa-utensils"></i> Lunch</a></li>
+                <li><a href="#"><i class="fas fa-utensils"></i> Dinner</a></li>
+                <li><a href="#"><i class="fas fa-leaf"></i> Vegetarian</a></li>
+                <li><a href="#"><i class="fas fa-ice-cream"></i> Sweets</a></li>
+                <li><a href="#"><i class="fas fa-glass-martini-alt"></i> Drinks</a></li>
+                <li><a href="#"><i class="fas fa-birthday-cake"></i> Cakes</a></li>
+            </ul>
+            <script>
+                // Select all menu links
+                const menuLinks = document.querySelectorAll('.menu a');
+            
+                // Add click event listener to each link
+                menuLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        // Remove 'active' class from all links
+                        menuLinks.forEach(item => item.classList.remove('active'));
+            
+                        // Add 'active' class to the clicked link
+                        link.classList.add('active');
+                    });
+                });
+            </script>
+            
+        </aside>
+        <main class="main-content">
+            <header>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search">
+                    <button><i class="fas fa-search" style="color: rgb(190, 190, 190);"></i></button>
+                </div>
+                <div class="header-icons">
+                    <i class="fas fa-download"></i>
+                    <i class="fas fa-user-circle user"></i> 
+                </div>
+                <div class="auth-buttons">
+                    <br><br><br><br><br><br><br>
+                    <button class="login-btn">Login</button>
+                    <button class="signup-btn">Sign Up</button>
+                </div>
+            </header>
+            <br><br><br><br><br>
+            <section class="recipes">
+                <div class="recipe">
+                    <img src="../image/recipe1.jpeg" alt="Recipe 1">
+                    <p><i class="fas fa-share-alt share-icon"></i>Recipe 1</p>
+                </div>
+                <div class="recipe">
+                    <img src="../image/recipe2.jpeg" alt="Recipe 2">
+                    <p><i class="fas fa-share-alt share-icon"></i>Recipe 2</p>
+                </div>
+                <div class="recipe">
+                    <img src="../image/recipe3.jpeg" alt="Recipe 3">
+                    <p><i class="fas fa-share-alt share-icon"></i>Recipe 3</p>
+                </div>
+                <div class="recipe">
+                    <img src="../image/recipe4.jpeg" alt="Recipe 4">
+                    <p><i class="fas fa-share-alt share-icon"></i>Recipe 4</p>
+                </div>
+                <div class="recipe">
+                    <img src="../image/recipe5.jpeg" alt="Recipe 5">
+                    <p><i class="fas fa-share-alt share-icon"></i>Recipe 5</p>
+                </div>
+                <div class="recipe">
+                    <img src="../image/recipe6.jpeg" alt="Recipe 6">
+                    <p><i class="fas fa-share-alt share-icon"></i>Recipe 6</p>
+                </div>
+                <div class="recipe">
+                    <img src="../image/recipe4.jpeg" alt="Recipe 4">
+                    <p><i class="fas fa-share-alt share-icon"></i>Recipe 4</p>
+                </div>
+                <div class="recipe">
+                    <img src="../image/recipe5.jpeg" alt="Recipe 5">
+                    <p><i class="fas fa-share-alt share-icon"></i>Recipe 5</p>
+                </div>
+                <div class="recipe">
+                    <img src="../image/recipe6.jpeg" alt="Recipe 6">
+                    <p><i class="fas fa-share-alt share-icon"></i>Recipe 6</p>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

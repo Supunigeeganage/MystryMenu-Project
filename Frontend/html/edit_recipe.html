@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Recipe</title>
+    <link rel="stylesheet" href="../css/edit_recipe.css
+    ">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <img src="../image/logo.jpg" alt="MystryMenu Logo" class="logo">
+        </div>
+        <div class="content">
+            <div class="profile-header">
+                <div class="heading">            
+                    <img src="../image/editrepicon.png" alt="Icon" class="icon">
+                    <h2>Edit Recipe</h2>
+                    <div class="change-recipe">
+                        <img src="../image/recipe6.jpeg" alt="Add Image Icon" class="add-image-icon">
+                        <input type="file" id="changereciInput" accept="image/*">
+                        <label for="changereciInput">Change your recipe image</label>
+                    </div>
+                </div>               
+            </div>
+            <form class="form">
+                <div class="form-group">
+                    <div class="form-group">
+                        <label for="recipe-name">Recipe Name</label>
+                        <input type="text" id="recipe-name" placeholder="Enter recipe name">
+                      </div>
+                      <div class="form-group">
+                        <label for="type">Type</label>
+                        <select id="type">
+                          <option>Breakfast</option>
+                          <option>Lunch</option>
+                          <option>Dinner</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="ingredient">Ingredient</label>
+                        <input type="text" id="ingredient" placeholder="Enter ingredients">
+                      </div>
+                      <div class="form-group">
+                        <label for="method">Method</label>
+                        <textarea id="method" placeholder="Enter cooking method"></textarea>
+                      </div>
+                      <div class="button-group">
+                        <button type="button" class="cancel">Cancel</button>
+                        <button type="submit" class="add">Add</button>
+                      </div>
+                  </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,209 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: rgba(255, 248, 229, 1);
+    overflow: hidden;
+}
+
+.container {
+    display: flex;
+}
+
+.sidebar {
+    width: 17%;
+    background-color: #fff;
+    border-right: 1px solid #ccc;
+    padding: 20px;
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-left: 80px;
+    font-family: 'Times New Roman';
+}
+
+.logimg {
+    width: 130px; /* Adjust size as needed */
+    margin-left: 10px; /* Adds space between text and logo */
+    border-radius: 50%; /* Makes the image circular */
+
+}
+.gold {
+    color: gold; /* Gold color for the 'M' */
+    font-family: 'Times New Roman';
+    font-size: 40px;
+}
+header {
+    display: flex;
+    justify-content: center; /* Centers the search bar */
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.header-icons {
+    position: absolute;
+    display: flex;
+    gap: 40px;
+    font-size: 40px;
+    color: #000;
+    cursor: pointer;
+    margin-left: 980px;
+    
+}
+.header-icons i:hover {
+    background-color: rgba(200, 200, 200, 0.5); /* Change to the desired color */
+    border-radius: 50%; /* Optional: makes the background circular */
+    padding: 2px; /* Optional: add some padding around the icon */
+    transform: scale(1.1);
+}
+.header-icons i {
+    width: 45px; /* Set fixed width */
+    height: 45px; /* Set fixed height */
+    line-height: 45px; /* Align icon vertically */
+    text-align: center; /* Align icon horizontally */
+    display: inline-block; /* Ensure it behaves like a box */
+    border-radius: 50%; /* Make it circular */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+    position: relative;
+}
+.search-bar {
+    display: flex;
+    align-items: center;
+    border: 1px solid #504f4f;
+    border-radius: 30px;
+    overflow: hidden; /* Ensures the button stays inside the bar */
+    width: 500px; /* Adjust the width as needed */
+    font-size: small;
+    font-family: 'Times New Roman';
+    padding: 5px;
+    padding-left: 20px;
+    background-color: #ffffff;
+    
+}
+.search-bar input {
+    flex: 1;
+    border: none;
+    font-size: 16px;
+    outline: none; /* Removes focus outline */
+    
+}
+.search-bar button {
+    background-color: white;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+.main-content {
+    width: 80%;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full viewport height */
+}
+.recipe-details img{
+    width: 200px;
+    height: 150px;
+    float: right;
+    padding-left: 20px;
+    padding-bottom: 20px;
+
+}
+.recipe-name{
+    margin-top: 55px;
+    font-weight: bold;
+    font-size: 20px;
+}
+.feedback textarea {
+  width: 400px;
+  height: 80px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.feedback button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #88c;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.feedback button:hover{
+    background-color: #a773d1;
+}
+.recipe-details p{
+    padding-right: 10px;
+    
+}
+.recipe-details {
+  max-height: 400px; /* Set a fixed height */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding: 10px;
+  border: 1px solid #dbd9d9; /* Optional: to visually separate the section */
+  background-color: #ffffff; /* Optional: background color */
+  padding-left: 20px;
+}
+.recipe-details::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Edge */
+}
+
+.recipe-list {
+  max-height: 430px; /* Set a fixed height */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding: 10px;
+  border: 1px solid #ffffff; /* Optional: to visually separate the section */
+  background-color: #ffffff; /* Optional: background color */
+  font-family: 'Times New Roman', Times, serif;
+}
+.recipe-list::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Edge */
+}
+.recipe-list img{
+    width: 210px;
+    height: 150px;
+    border-radius: 20px;
+}
+.recipe-list a {
+    text-decoration: none;
+    color: #000;
+    font-size: 18px;
+}
+.heart-btn i {
+  color: black;
+  cursor: pointer;
+  transition: color 0.6s ease;
+}
+
+.heart-btn.clicked i {
+  color: red;
+}
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.actions button {
+  padding: 10px 15px;
+  border: none;
+  background-color: #ddd;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.share-icon:hover {
+    color: #0056b3; /* Darker blue on hover */
+}
+.download-icon:hover {
+    color: #0056b3; /* Darker blue on hover */
+}

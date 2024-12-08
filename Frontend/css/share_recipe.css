@@ -1,0 +1,141 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f9f9f9;
+}
+
+.container {
+    display: flex;
+    width: 60%;
+    max-width: 900px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo-section {
+    flex: 1;
+    background-color: rgba(255, 248, 229, 1);
+    text-align: center;
+    padding: 20px;
+}
+
+.logo-section .logo {
+    width: 300px;
+    height: auto;
+    margin-top: 70px;
+}
+
+.heading {
+    display: flex;
+    align-items: center;
+    margin-left: 90px;
+    margin-bottom: 20px;
+    margin-top: 30px;
+    gap: 10px;
+
+}
+
+.heading .icon {
+    width: 60px;
+    height: 60px;
+}
+
+.heading h2 {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+.recipe{
+    display: flex;
+    flex-direction: column;
+}
+.recipe img{
+    width: 170px;
+    height: 150px;
+    margin-left: 150px;
+    margin-right: 300px;
+    margin-top: 40px;
+    border-radius: 10px;
+}
+.recipe p{
+    margin-left: 205px;
+    margin-right: 300px;
+    margin-top: 10px;
+}
+.share-icons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    margin-top: 60px;
+    margin-left: 105px;
+}
+.icon:hover {
+    background-color: rgba(200, 200, 200, 0.5); /* Change to the desired color */
+    border-radius: 50%; /* Optional: makes the background circular */
+    padding: 2px; /* Optional: add some padding around the icon */
+    transform: scale(1.1);
+}
+
+
+.icon {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background-size: cover;
+    cursor: pointer;
+}
+
+.facebook {
+    background-image: url('../image/fb.png');
+    background-color: #1877f2;
+}
+
+.messenger {
+    background-image: url('../image/messenger.png');
+    background-color: #00b2ff;
+}
+
+.instagram {
+    background-image: url('../image/insta.png');
+    background-color: #e1306c;
+}
+
+.whatsapp {
+    background-image: url('../image/whatsapp.png');
+    background-color: #25d366;
+}
+
+.x-platform {
+    background-image: url('../image/thread.png');
+    background-color: #000;
+}
+.cancel-btn {
+    padding: 10px 50px;
+    font-size: 16px;
+    color: white;
+    background-color: #ff4d4d;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 167px;
+    margin-top: 40px;
+    margin-bottom: 30px;
+}
+
+.cancel-btn:hover {
+    background-color: #be0000;
+}
