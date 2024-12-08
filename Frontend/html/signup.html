@@ -16,30 +16,27 @@
                 <img src="../image/signicon.png" alt="Icon" class="icon">
                 <h2>Sign Up</h2>
             </div>
-            <form>
-                <input type="text" placeholder="First name" required>
-                <input type="text" placeholder="Last name" required>
-                <select>
-                    <option value="" disabled selected>Enter country</option>
-                    <option value="USA">United States</option>
-                    <option value="Canada">Canada</option>
-                    <option value="UK">United Kingdom</option>
-                    <option value="Australia">Australia</option>
-                    <option value="India">India</option>
-                    <!-- Add more countries as needed -->
-                </select>
-                <select>
+            <form action="../../backend/signUp.php" method="POST">
+                <input type="text" name="firstName" placeholder="First name" required>
+                <input type="text" name="lastName" placeholder="Last name" required>
+                <select name="gender" required>
                     <option value="" disabled selected>Gender</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                 </select>                
-                <input type="text" name="profession" placeholder="Profession">
+                <select>
+                    <option value="" disabled selected>Profession</option>
+                    <option value="Chef">Chef</option>
+                    <option value="Baker">Baker</option>
+                    <option value="Cake Decorator">Cake Decorator</option>
+                    <option value="Bartender">Bartender</option>
+                </select>
                 <input type="email" name="email" placeholder="E mail" required>
                 <input type="password" name="password" placeholder="Password" required>
                 <button type="submit" class="signup-btn">Sign Up</button>
             </form>
             <br>
-            <p>Already a member? <a href="#">Sign In</a></p>
+            <p>Already a member? <a href="#">sign In</a></p>
         </div>
     </div>
     <div id="toast" class="toast"></div>
