@@ -55,6 +55,10 @@
                 <div class="auth-buttons">
                     <button class="login-btn">Beginner</button>
                 </div>
+                <!-- Logout button -->
+                <div class="auth-buttons">
+                    <a href="../../backend/logout.php"><button class="logout-btn">Logout</button></a>
+                </div>             
             </header>
             <br><br><br><br><br>
             <section class="recipes">
@@ -83,7 +87,28 @@
                     <p><i class="fas fa-share-alt share-icon"></i>Recipe 6</p>
                 </div>
             </section>
+            
         </main>
     </div>
+    <div id="toast" class="toast"></div>
+    <script>
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            
+            // Remove the toast after 3 seconds
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Check for URL parameters to show appropriate messages
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('login')) {
+            showToast('Successfully logged in!', 'success');
+        }
+    </script>
 </body>
 </html>

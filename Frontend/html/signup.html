@@ -33,5 +33,27 @@
             <p>Already a member? <a href="#">sign In</a></p>
         </div>
     </div>
+    <div id="toast" class="toast"></div>
+    <script>
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Check for URL parameters to show appropriate messages
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('error')) {
+            showToast('Registration failed. Please try again.', 'error');
+        }
+        if (urlParams.has('exists')) {
+            showToast('Email already registered', 'error');
+        }
+    </script>
 </body>
 </html>
