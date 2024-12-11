@@ -16,7 +16,7 @@
                 <img src="../image/signicon.png" alt="Icon" class="icon">
                 <h2>Sign Up</h2>
             </div>
-            <form action="../../backend/signUp.php" method="POST">
+            <form action="../../backend/signUp.php" method="POST" >
                 <input type="text" name="firstName" placeholder="First name" required>
                 <input type="text" name="lastName" placeholder="Last name" required>
                 <select name="gender" required>
@@ -24,7 +24,7 @@
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                 </select>                
-                <select>
+                <select name="profession" required id="profession">
                     <option value="" disabled selected>Profession</option>
                     <option value="Chef">Chef</option>
                     <option value="Baker">Baker</option>

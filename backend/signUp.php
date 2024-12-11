@@ -5,7 +5,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $firstName = $_POST['firstName'];
     $lastName = $_POST['lastName'];
     $gender = $_POST['gender'] ?? '';
-    $profession = $_POST['profession'];
+    $profession = $_POST['profession'] ?? '';
     $email = $_POST['email'];
     $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
     $userType = 'user';
