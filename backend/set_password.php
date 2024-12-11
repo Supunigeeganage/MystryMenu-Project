@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Update the password in the database
     try {
-        $stmt = $pdo->prepare("UPDATE Users SET password = ? WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE Users SET password_hash = ? WHERE id = ?");
         $stmt->execute([$hashed_password, $_SESSION['user_id']]);
 
         // Remove OTP and expire
@@ -39,7 +39,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: ../frontend/html/login.html?success=password_reset");
         exit;
 
+        // to find the error created a log 
     } catch (PDOException $e) {
+        $logFile = '../logs/error_log.txt';  
+        $handle = fopen($logFile, 'a');
+        
+        $errorMessage = "Database error: " . $e->getMessage(); 
+        fwrite($handle, "[" . date('Y-m-d H:i:s') . "] " . $errorMessage . PHP_EOL); 
+        
+        fclose($handle); 
+
         header("Location: ../frontend/html/set_password.html?error=database_error");
         exit;
     }
