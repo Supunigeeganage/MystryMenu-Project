@@ -22,20 +22,20 @@
                             <img src="../image/addimg.png" alt="Add Image Icon" class="add-image-icon">
                             <span>Recipe Image</span>
                           </div>
-                          <input type="file" id="image-upload" accept="image/*">
+                          <input type="file" id="image-upload" name="recipe-image" accept="image/*">
                         </label>
                     </div>
                 </div>               
             </div>
-            <form class="form">
+            <form class="form" action="../../backend/addRecipe.php" method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <div class="form-group">
                         <label for="recipe-name">Recipe Name</label>
-                        <input type="text" id="recipe-name" placeholder="Enter recipe name">
+                        <input type="text" id="recipe-name" name="recipe-name" placeholder="Enter recipe name">
                       </div>
                       <div class="form-group">
                         <label for="type">Type</label>
-                        <select id="type">
+                        <select id="type" name="type">
                           <option>Breakfast</option>
                           <option>Lunch</option>
                           <option>Dinner</option>
@@ -47,11 +47,11 @@
                       </div>
                       <div class="form-group">
                         <label for="ingredient">Ingredient</label>
-                        <input type="text" id="ingredient" placeholder="Enter ingredients">
+                        <input type="text" id="ingredient" name="ingredient" placeholder="Enter ingredients">
                       </div>
                       <div class="form-group">
                         <label for="method">Method</label>
-                        <textarea id="method" placeholder="Enter cooking method"></textarea>
+                        <textarea id="method" name="method"placeholder="Enter cooking method"></textarea>
                       </div>
                       <div class="button-group">
                         <button type="button" class="cancel">Cancel</button>

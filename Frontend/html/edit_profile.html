@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile</title>
     <link rel="stylesheet" href="../css/edit_profile.css">
+    <link rel="stylesheet" href="../css/toast.css">
 </head>
 <body>
     <div class="container">
@@ -16,40 +17,158 @@
                 <div class="heading">            
                     <img src="../image/editproicon.png" alt="Icon" class="icon">
                     <h2>Edit Profile</h2>
+                    <button type="button" id="edit-toggle-btn" aria-label="Toggle Edit Mode">Edit</button>
                 </div>
                 <div class="profile-pic">
                     <img id="preview" src="../image/profile-pic.png" alt="Profile Picture">
-                    <input type="file" id="profilePicInput" accept="image/*">
+                    <input type="file" id="profilePicInput" accept="image/*" disabled>
                     <label for="profilePicInput">Change your profile picture</label>
                 </div>                
             </div>
-            <form class="form">
+            <form id="edit-profile-form" novalidate>
                 <div class="form-group">
-                    <input type="text" placeholder="Enter first name">
-                </div>
-                <div class="form-group">
-                    <input type="text" placeholder="Enter last name">
-                    <select>
-                        <option value="" disabled selected>Gender</option>
-                        <option>Male</option>
-                        <option>Female</option>
-                    </select>
-                    <select>
-                        <option value="" disabled selected>Profession</option>
+                    <input type="text" id="firstName" placeholder="First Name" disabled>
+                    <input type="text" id="lastName" placeholder="Last Name" disabled>
+                    <input type="text" id="gender" placeholder="Gender" disabled readonly>
+                    <select id="profession" disabled>
+                        <option value="" disabled selected>Change the Profession</option>
                         <option value="Chef">Chef</option>
                         <option value="Baker">Baker</option>
                         <option value="Cake Decorator">Cake Decorator</option>
                         <option value="Bartender">Bartender</option>
                     </select>
-                    <input type="password" placeholder="Enter current password">
-                    <input type="password" placeholder="Enter new password">
-                    <input type="password" placeholder="Confirm new password">
+                    <input type="email" id="email" placeholder="Email" disabled>
+                    <input type="password" id="currentPassword" placeholder="Current Password" disabled>
+                    <input type="password" id="newPassword" placeholder="New Password" disabled>
+                    <input type="password" id="confirmPassword" placeholder="Confirm New Password" disabled>
                     <div class="button-group">
-                        <button type="button" class="cancel-btn">Cancel</button>
+                        <button type="button" id="cancel-btn" class="cancel-btn">Cancel</button>
                         <button type="submit" class="edit-btn">Save</button>
                     </div>
+                </div>
             </form>
         </div>
     </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const form = document.getElementById('edit-profile-form');
+        const editToggleBtn = document.getElementById('edit-toggle-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const toast = document.getElementById('toast');
+        let isEditable = false;
+
+        function toggleEditState() {
+            isEditable = !isEditable;
+            const inputs = form.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.disabled = !isEditable;
+            });
+            editToggleBtn.textContent = isEditable ? 'View' : 'Edit';
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        function saveProfile(event) {
+            event.preventDefault();
+            if (!isEditable) return;
+
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Create the profile data object
+            const profileData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                gender: document.getElementById('gender').value,
+                profession: document.getElementById('profession').value,
+                email: document.getElementById('email').value,
+            };
+
+            // If password fields are filled, add them to the request
+            if (currentPassword || newPassword || confirmPassword) {
+                if (newPassword !== confirmPassword) {
+                    showToast('New password and confirm password do not match.', 'error');
+                    return;
+                }
+                profileData.action = 'changePassword';
+                profileData.currentPassword = currentPassword;
+                profileData.newPassword = newPassword;
+                profileData.confirmPassword = confirmPassword;
+            } else {
+                profileData.action = 'updateProfile';
+            }
+
+            fetch('../../backend/update_user_profile.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(profileData),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    showToast(data.message, 'success');
+                    toggleEditState();
+                    // Clear password fields
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                    // Reload profile data
+                    loadProfileData();
+                } else {
+                    showToast(data.message || 'Update failed', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Failed to update profile. Please try again.', 'error');
+            });
+        }
+
+        function loadProfileData() {
+            fetch('../../backend/get_user_profile.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        document.getElementById('firstName').value = data.firstName || '';
+                        document.getElementById('lastName').value = data.lastName || '';
+                        document.getElementById('gender').value = data.gender || '';
+                        document.getElementById('profession').value = data.profession || '';
+                        document.getElementById('email').value = data.email || '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching profile data:', error);
+                });
+        }
+
+        editToggleBtn.addEventListener('click', toggleEditState);
+        cancelBtn.addEventListener('click', () => {
+            toggleEditState();
+            loadProfileData();
+
+            window.location.href = 'profile.html'; 
+        });
+        form.addEventListener('submit', saveProfile);
+
+        document.addEventListener('DOMContentLoaded', loadProfileData);
+    </script>
 </body>
 </html>
