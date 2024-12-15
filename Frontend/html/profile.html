@@ -105,5 +105,25 @@
             </section>
         </main>
     </div>
+    <script>
+        function loadProfileData() {
+            fetch('../../backend/get_user_profile.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        if (data.profilePicture) {
+                            document.getElementById('preview').src = '../../backend' + data.profilePicture;
+                        } else {
+                            document.getElementById('preview').src = '../image/profile-pic.png';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching profile data:', error);
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProfileData);
+    </script>
 </body>
 </html>

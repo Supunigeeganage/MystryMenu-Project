@@ -21,7 +21,7 @@
                 </div>
                 <div class="profile-pic">
                     <img id="preview" src="../image/profile-pic.png" alt="Profile Picture">
-                    <input type="file" id="profilePicInput" accept="image/*" disabled>
+                    <input type="file" id="profilePicInput" accept="image/*">
                     <label for="profilePicInput">Change your profile picture</label>
                 </div>                
             </div>
@@ -86,7 +86,7 @@
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
 
-            // Create the profile data object
+            //profile data object
             const profileData = {
                 firstName: document.getElementById('firstName').value,
                 lastName: document.getElementById('lastName').value,
@@ -95,7 +95,6 @@
                 email: document.getElementById('email').value,
             };
 
-            // If password fields are filled, add them to the request
             if (currentPassword || newPassword || confirmPassword) {
                 if (newPassword !== confirmPassword) {
                     showToast('New password and confirm password do not match.', 'error');
@@ -130,7 +129,6 @@
                     document.getElementById('currentPassword').value = '';
                     document.getElementById('newPassword').value = '';
                     document.getElementById('confirmPassword').value = '';
-                    // Reload profile data
                     loadProfileData();
                 } else {
                     showToast(data.message || 'Update failed', 'error');
@@ -152,6 +150,12 @@
                         document.getElementById('gender').value = data.gender || '';
                         document.getElementById('profession').value = data.profession || '';
                         document.getElementById('email').value = data.email || '';
+                        
+                        if (data.profilePicture) {
+                            document.getElementById('preview').src = '../../backend' + data.profilePicture;
+                        } else {
+                            document.getElementById('preview').src = '../image/profile-pic.png';
+                        }
                     }
                 })
                 .catch(error => {
@@ -169,6 +173,36 @@
         form.addEventListener('submit', saveProfile);
 
         document.addEventListener('DOMContentLoaded', loadProfileData);
+        
+        function uploadProfilePicture() {
+            const profilePicInput = document.getElementById('profilePicInput');
+            if (!profilePicInput.files.length) {
+                showToast('No file selected', 'error');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('profilePicture', profilePicInput.files[0]);
+            
+            fetch('../../backend/profilePicture.php', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showToast(data.message, 'success');
+                    document.getElementById('preview').src = '../../backend' + data.profilePicture;
+                } else {
+                    showToast(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error uploading profile picture:', error);
+                showToast('Failed to upload profile picture. Please try again.', 'error');
+            });
+        }
+        document.getElementById('profilePicInput').addEventListener('change', uploadProfilePicture);
     </script>
 </body>
 </html>
