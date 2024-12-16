@@ -17,7 +17,7 @@
             <ul class="menu">
                 <li><a href="./dashboard.html"><i class="fas fa-home"></i> Home</a></li>
                 <li><a href="./edit_profile.html"><i class="fas fa-edit"></i> Edit</a></li>
-                <li><a href=""><i class="fas fa-trash-alt"></i> Delete Profile</a></li>
+                <li><a href="" class="delete-profile"><i class="fas fa-trash-alt"></i> Delete Profile</a></li>
                 <li><a href="./add_recipe.html"><i class="fas fa-plus-circle"></i> Add Recipe</a></li>
                 <li><a href="../../backend/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
@@ -122,8 +122,67 @@
                     console.error('Error fetching profile data:', error);
                 });
         }
-
         document.addEventListener('DOMContentLoaded', loadProfileData);
+        
+        //delete use profile
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteLink = document.querySelector('.delete-profile');
+            
+            deleteLink.addEventListener('click', function(event) {
+                event.preventDefault();
+                
+                if (confirm('Are you sure you want to delete your profile?')) {
+                    fetch('../../backend/deleteProfile.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text();
+                    })
+                    .then(text => {
+                        try {
+                            const data = JSON.parse(text);
+                            if (data.status === 'success') {
+                                showToast('Profile deleted successfully', 'success');
+                                setTimeout(() => {
+                                    window.location.href = './signup.html';
+                                }, 1000);
+                            } else {
+                                showToast(data.message || 'Error deleting profile', 'error');
+                            }
+                        } catch (e) {
+                            console.error('Error parsing JSON:', text);
+                            showToast('Invalid server response', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('Failed to delete profile. Please try again.', 'error');
+                    });
+                }
+            });
+        });
+
+        const toastDiv = document.createElement('div');
+        toastDiv.id = 'toast';
+        toastDiv.className = 'toast';
+        document.body.appendChild(toastDiv);
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
     </script>
 </body>
 </html>

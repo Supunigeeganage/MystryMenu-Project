@@ -105,6 +105,22 @@
         if (urlParams.has('login')) {
             showToast('Successfully logged in!', 'success');
         }
+
+        function loadProfilePicture() {
+            fetch('../../backend/get_user_profile.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.profilePicture) {
+                        const profilePicElement = document.querySelector('.header-icons img');
+                        profilePicElement.src = '../../backend' + data.profilePicture;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching profile picture:', error);
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProfilePicture);
     </script>
 </body>
 </html>
