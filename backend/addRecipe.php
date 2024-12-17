@@ -1,7 +1,17 @@
 <?php
+session_start();
 require_once 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_SESSION['user_id'])) {
+        $response = [
+            'success' => false,
+            'message' => 'User not logged in',
+        ];
+        echo json_encode($response);
+        exit;
+    }
+
     $response = [
         'success' => false,
         'message' => '',
@@ -12,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $type = $_POST['type'] ?? '';
     $ingredient = $_POST['ingredient'] ?? '';
     $method = $_POST['method'] ?? '';
+    $userId = $_SESSION['user_id'];
 
     // Validate inputs
     if (empty($recipeName) || empty($type) || empty($ingredient) || empty($method)) {
@@ -22,18 +33,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Handle image upload
     $imagePath = '';
-    if (!empty($_FILES['recipe-image']['name'])) {
-        $imageTmpName = $_FILES['recipe-image']['tmp_name'];
-        $imageName = basename($_FILES['recipe-image']['name']);
-        $imagePath = 'uploads/' . $imageName;
-
-        // Check for uploads directory
-        if (!is_dir('uploads')) {
-            mkdir('uploads', 0777, true);
+    if (isset($_FILES['recipe-image']) && $_FILES['recipe-image']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = 'recipe_Image/';
+        
+        // Create directory if it doesn't exist
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
         }
 
+        // Get file information
+        $fileName = $_FILES['recipe-image']['name'];
+        $tmpName = $_FILES['recipe-image']['tmp_name'];
+        $fileSize = $_FILES['recipe-image']['size'];
+        $fileType = $_FILES['recipe-image']['type'];
+
+        // Validate file type
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        if (!in_array($fileType, $allowedTypes)) {
+            $response['message'] = 'Invalid file type. Only JPG, JPEG & PNG files are allowed.';
+            echo json_encode($response);
+            exit;
+        }
+
+        // Generate unique filename
+        $imageExtension = pathinfo($fileName, PATHINFO_EXTENSION);
+        $uniqueFilename = uniqid() . '.' . $imageExtension;
+        $imagePath = $uploadDir . $uniqueFilename;
+
         // Move the uploaded file
-        if (!move_uploaded_file($imageTmpName, $imagePath)) {
+        if (!move_uploaded_file($tmpName, $imagePath)) {
             $response['message'] = 'Failed to upload image.';
             echo json_encode($response);
             exit;
@@ -42,15 +70,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Insert data into the database
     try {
-        $sql = "INSERT INTO recipes (recipe_name, type, ingredient, method, image_path) 
-                VALUES (:recipeName, :type, :ingredient, :method, :imagePath)";
+        $sql = "INSERT INTO recipe (name, type, ingredient, method, image, user_id) 
+                VALUES (:name, :type, :ingredient, :method, :image, :user_id)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
-            ':recipeName' => $recipeName,
+            ':name' => $recipeName,
             ':type' => $type,
             ':ingredient' => $ingredient,
             ':method' => $method,
-            ':imagePath' => $imagePath,
+            ':image' => $imagePath,
+            ':user_id' => $userId
         ]);
 
         $response['success'] = true;
