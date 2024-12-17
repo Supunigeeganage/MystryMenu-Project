@@ -24,16 +24,10 @@
                 <li><a href="#"><i class="fas fa-birthday-cake"></i> Cakes</a></li>
             </ul>
             <script>
-                // Select all menu links
                 const menuLinks = document.querySelectorAll('.menu a');
-            
-                // Add click event listener to each link
                 menuLinks.forEach(link => {
                     link.addEventListener('click', () => {
-                        // Remove 'active' class from all links
                         menuLinks.forEach(item => item.classList.remove('active'));
-            
-                        // Add 'active' class to the clicked link
                         link.classList.add('active');
                     });
                 });
@@ -93,14 +87,10 @@
             toast.textContent = message;
             toast.className = `toast ${type}`;
             toast.style.display = 'block';
-            
-            // Remove the toast after 3 seconds
             setTimeout(() => {
                 toast.style.display = 'none';
             }, 3000);
         }
-
-        // Check for URL parameters to show appropriate messages
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('login')) {
             showToast('Successfully logged in!', 'success');
