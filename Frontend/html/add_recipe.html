@@ -19,11 +19,11 @@
                     <h2>Add Recipe</h2>
                     <div class="form-group">
                         <label for="image-upload" class="image-upload">
-                          <div class="upload-placeholder">
-                            <img src="../image/addimg.png" alt="Add Image Icon" class="add-image-icon" id="preview-image">
-                            <span>Recipe Image</span>
-                          </div>
-                          <input type="file" id="image-upload" name="recipe-image" accept="image/*" onchange="previewImage(this)">
+                            <div class="upload-placeholder">
+                                <img id="preview" src="../image/addimg.png" alt="Recipe Image" class="add-image-icon">
+                                <input type="file" id="image-upload" name="recipe-image" accept="image/*">
+                                <label for="image-upload">Add Recipe Image</label>
+                            </div>
                         </label>
                     </div>
                 </div>               
@@ -64,15 +64,50 @@
         </div>
     </div>
     <script>
+        document.getElementById('recipeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const imageInput = document.getElementById('image-upload');
+            if (imageInput.files.length > 0) {
+                formData.append('recipe-image', imageInput.files[0]);
+            }
+
+            try {
+                const response = await fetch('../../backend/addRecipe.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showToast('Recipe added successfully!', 'success');
+                    this.reset();
+                    document.getElementById('preview').src = '../image/addimg.png';
+                    setTimeout(() => {
+                        window.location.href = 'profile.html';
+                    }, 1000);
+                } else {
+                    showToast(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred while submitting the recipe', 'error');
+            }
+        });
+
         function previewImage(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    document.getElementById('preview-image').src = e.target.result;
+                    document.getElementById('preview').src = e.target.result;
                 };
                 reader.readAsDataURL(input.files[0]);
             }
         }
+        document.getElementById('image-upload').addEventListener('change', function() {
+            previewImage(this);
+        });
 
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
@@ -81,36 +116,8 @@
             toast.style.display = 'block';
             setTimeout(() => {
                 toast.style.display = 'none';
-            }, 7000);
+            }, 3000);
         }
-
-        document.getElementById('recipeForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-
-            fetch('../../backend/addRecipe.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showToast(data.message, 'success');
-                    this.reset();
-                    document.getElementById('preview-image').src = '../image/addimg.png';
-                    setTimeout(() => {
-                        window.location.href = 'profile.html';
-                    }, 2000);
-                } else {
-                    showToast(data.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast('An error occurred while submitting the recipe', 'error');
-            });
-        });
     </script>
     <div id="toast" class="toast"></div>
 </body>

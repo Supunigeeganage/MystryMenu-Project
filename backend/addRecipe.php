@@ -24,48 +24,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $method = $_POST['method'] ?? '';
     $userId = $_SESSION['user_id'];
 
-    // Validate inputs
     if (empty($recipeName) || empty($type) || empty($ingredient) || empty($method)) {
         $response['message'] = 'All fields are required.';
         echo json_encode($response);
         exit;
     }
 
-    // Handle image upload
+    // image upload
     $imagePath = '';
     if (isset($_FILES['recipe-image']) && $_FILES['recipe-image']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = 'recipe_Image/';
-        
-        // Create directory if it doesn't exist
+        $file = $_FILES['recipe-image'];
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        $uploadDir = __DIR__ . '/recipe_image/';
+        $maxFileSize = 10 * 1024 * 1024;
+
+        if (!in_array($file['type'], $allowedTypes)) {
+            $response['message'] = 'Invalid file type. Only JPG, PNG, and GIF are allowed.';
+            echo json_encode($response);
+            exit;
+        }
+
+        if ($file['size'] > $maxFileSize) {
+            $response['message'] = 'File size exceeds the 10MB limit.';
+            echo json_encode($response);
+            exit;
+        }
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
 
-        // Get file information
-        $fileName = $_FILES['recipe-image']['name'];
-        $tmpName = $_FILES['recipe-image']['tmp_name'];
-        $fileSize = $_FILES['recipe-image']['size'];
-        $fileType = $_FILES['recipe-image']['type'];
-
-        // Validate file type
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-        if (!in_array($fileType, $allowedTypes)) {
-            $response['message'] = 'Invalid file type. Only JPG, JPEG & PNG files are allowed.';
-            echo json_encode($response);
-            exit;
-        }
-
         // Generate unique filename
-        $imageExtension = pathinfo($fileName, PATHINFO_EXTENSION);
-        $uniqueFilename = uniqid() . '.' . $imageExtension;
-        $imagePath = $uploadDir . $uniqueFilename;
+        $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $newFileName = 'recipe_' . $userId . '_' . time() . '.' . $ext;
+        $filePath = $uploadDir . $newFileName;
 
         // Move the uploaded file
-        if (!move_uploaded_file($tmpName, $imagePath)) {
+        if (!move_uploaded_file($file['tmp_name'], $filePath)) {
             $response['message'] = 'Failed to upload image.';
             echo json_encode($response);
             exit;
         }
+
+        $imagePath = '/recipe_image/' . $newFileName;
     }
 
     // Insert data into the database

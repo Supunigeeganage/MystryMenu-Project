@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Recipe</title>
-    <link rel="stylesheet" href="../css/edit_recipe.css
-    ">
+    <link rel="stylesheet" href="../css/edit_recipe.css">
+    <link rel="stylesheet" href="../css/toast.css">
 </head>
 <body>
     <div class="container">
@@ -24,36 +24,135 @@
                     </div>
                 </div>               
             </div>
-            <form class="form">
+            <form class="form" id="editRecipeForm">
                 <div class="form-group">
                     <div class="form-group">
                         <label for="recipe-name">Recipe Name</label>
-                        <input type="text" id="recipe-name" placeholder="Enter recipe name">
-                      </div>
-                      <div class="form-group">
+                        <input type="text" id="recipe-name" name="recipe-name" placeholder="Enter recipe name" required>
+                    </div>
+                    <div class="form-group">
                         <label for="type">Type</label>
-                        <select id="type">
-                          <option>Breakfast</option>
-                          <option>Lunch</option>
-                          <option>Dinner</option>
+                        <select id="type" name="type" required>
+                            <option value="">Select Type</option>
+                            <option>Breakfast</option>
+                            <option>Lunch</option>
+                            <option>Dinner</option>
+                            <option>Vegetarian</option>
+                            <option>Sweets</option>
+                            <option>Drinks</option>
+                            <option>Cakes</option>
                         </select>
-                      </div>
-                      <div class="form-group">
+                    </div>
+                    <div class="form-group">
                         <label for="ingredient">Ingredient</label>
-                        <input type="text" id="ingredient" placeholder="Enter ingredients">
-                      </div>
-                      <div class="form-group">
+                        <input type="text" id="ingredient" name="ingredient" placeholder="Enter ingredients" required>
+                    </div>
+                    <div class="form-group">
                         <label for="method">Method</label>
-                        <textarea id="method" placeholder="Enter cooking method"></textarea>
-                      </div>
-                      <div class="button-group">
-                        <button type="button" class="cancel">Cancel</button>
-                        <button type="submit" class="add">Add</button>
-                      </div>
-                  </div>
+                        <textarea id="method" name="method" placeholder="Enter cooking method" required></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button type="button" class="cancel" onclick="window.history.back()">Cancel</button>
+                        <button type="submit" class="add">Update</button>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
+    <script>
+        let recipeId;
+
+        const toastDiv = document.createElement('div');
+        toastDiv.id = 'toast';
+        toastDiv.className = 'toast';
+        document.body.appendChild(toastDiv);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            recipeId = urlParams.get('id');
+            
+            if (!recipeId) {
+                showToast('Recipe ID not found', 'error');
+                return;
+            }
+            loadRecipeDetails();
+        });
+
+        function loadRecipeDetails() {
+            fetch(`../../backend/getRecipeDetails.php?id=${recipeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const recipe = data.recipe;
+                        document.getElementById('recipe-name').value = recipe.name;
+                        document.getElementById('type').value = recipe.type;
+                        document.getElementById('ingredient').value = recipe.ingredient;
+                        document.getElementById('method').value = recipe.method;
+                        if (recipe.image) {
+                            document.querySelector('.add-image-icon').src = '../../backend' + recipe.image;
+                        }
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Error loading recipe details', 'error');
+                });
+        }
+
+        //image preview
+        document.getElementById('changereciInput').addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.querySelector('.add-image-icon').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        //form submission
+        document.getElementById('editRecipeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            formData.append('recipe_id', recipeId);
+
+            // Add image if selected
+            const imageInput = document.getElementById('changereciInput');
+            if (imageInput.files.length > 0) {
+                formData.append('recipe-image', imageInput.files[0]);
+            }
+
+            try {
+                const response = await fetch('../../backend/updateRecipe.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showToast('Recipe updated successfully!', 'success');
+                } else {
+                    showToast(data.message || 'Error updating recipe', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred while updating the recipe', 'error');
+            }
+        });
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+    </script>
 </body>
 </html>
