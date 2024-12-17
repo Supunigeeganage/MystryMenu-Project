@@ -38,70 +38,7 @@
                 </div>
             </div>
             <h3>My Recipe</h3>
-            <section class="recipes">
-                <div class="recipe">
-                    <img src="../image/recipe1.jpeg" alt="Recipe 1">
-                    <p>Recipe 1</p>
-                    <i class="fas fa-edit edit-icon"></i>
-                    <i class="fas fa-share-alt share-icon"></i>
-                    <i class="fas fa-trash-alt delete-icon"></i>
-                </div>
-                <div class="recipe">
-                    <img src="../image/recipe2.jpeg" alt="Recipe 2">
-                    <p>Recipe 2</p>
-                    <i class="fas fa-edit edit-icon"></i>
-                    <i class="fas fa-share-alt share-icon"></i>
-                    <i class="fas fa-trash-alt delete-icon"></i>
-                </div>
-                <div class="recipe">
-                    <img src="../image/recipe3.jpeg" alt="Recipe 3">
-                    <p>Recipe 3</p>
-                    <i class="fas fa-edit edit-icon"></i>
-                    <i class="fas fa-share-alt share-icon"></i>
-                    <i class="fas fa-trash-alt delete-icon"></i>
-                </div>
-                <div class="recipe">
-                    <img src="../image/recipe1.jpeg" alt="Recipe 1">
-                    <p>Recipe 1</p>
-                    <i class="fas fa-edit edit-icon"></i>
-                    <i class="fas fa-share-alt share-icon"></i>
-                    <i class="fas fa-trash-alt delete-icon"></i>
-                </div>
-                <div class="recipe">
-                    <img src="../image/recipe2.jpeg" alt="Recipe 2">
-                    <p>Recipe 2</p>
-                    <i class="fas fa-edit edit-icon"></i>
-                    <i class="fas fa-share-alt share-icon"></i>
-                    <i class="fas fa-trash-alt delete-icon"></i>
-                </div>
-                <div class="recipe">
-                    <img src="../image/recipe3.jpeg" alt="Recipe 3">
-                    <p>Recipe 3</p>
-                    <i class="fas fa-edit edit-icon"></i>
-                    <i class="fas fa-share-alt share-icon"></i>
-                    <i class="fas fa-trash-alt delete-icon"></i>
-                </div>
-                <div class="recipe">
-                    <img src="../image/recipe1.jpeg" alt="Recipe 1">
-                    <p>Recipe 1</p>
-                    <i class="fas fa-edit edit-icon"></i>
-                    <i class="fas fa-share-alt share-icon"></i>
-                    <i class="fas fa-trash-alt delete-icon"></i>
-                </div>
-                <div class="recipe">
-                    <img src="../image/recipe2.jpeg" alt="Recipe 2">
-                    <p>Recipe 2</p>
-                    <i class="fas fa-edit edit-icon"></i>
-                    <i class="fas fa-share-alt share-icon"></i>
-                    <i class="fas fa-trash-alt delete-icon"></i>
-                </div>
-                <div class="recipe">
-                    <img src="../image/recipe3.jpeg" alt="Recipe 3">
-                    <p>Recipe 3</p>
-                    <i class="fas fa-edit edit-icon"></i>
-                    <i class="fas fa-share-alt share-icon"></i>
-                    <i class="fas fa-trash-alt delete-icon"></i>
-                </div>
+            <section class="recipes" id="recipesContainer">
             </section>
         </main>
     </div>
@@ -183,6 +120,80 @@
                 toast.style.display = 'none';
             }, 3000);
         }
+
+        // load user's recipes
+        function loadUserRecipes() {
+            fetch('../../backend/getUserRecipes.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const recipesContainer = document.getElementById('recipesContainer');
+                        recipesContainer.innerHTML = '';
+
+                        data.recipes.forEach(recipe => {
+                            const recipeElement = document.createElement('div');
+                            recipeElement.className = 'recipe';
+                            recipeElement.innerHTML = `
+                                <img src="${recipe.image ? '../../backend' + recipe.image : '../image/recipe1.jpeg'}" 
+                                     alt="${recipe.name}" 
+                                     onerror="this.src='../image/recipe1.jpeg'">
+                                <p>${recipe.name}</p>
+                                <i class="fas fa-edit edit-icon" onclick="editRecipe(${recipe.recipe_id})"></i>
+                                <i class="fas fa-share-alt share-icon" onclick="shareRecipe(${recipe.recipe_id})"></i>
+                                <i class="fas fa-trash-alt delete-icon" onclick="deleteRecipe(${recipe.recipe_id})"></i>
+                            `;
+                            
+                            recipesContainer.appendChild(recipeElement);
+                        });
+                    } else {
+                        showToast('No recipes found', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading recipes:', error);
+                    showToast('Error loading recipes', 'error');
+                });
+        }
+
+        // delete a recipe
+        function deleteRecipe(recipeId) {
+            if (confirm('Are you sure you want to delete this recipe?')) {
+                fetch('../../backend/deleteRecipe.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ recipe_id: recipeId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showToast('Recipe deleted successfully', 'success');
+                        loadUserRecipes(); // Reload the recipes
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Failed to delete recipe', 'error');
+                });
+            }
+        }
+
+        // edit a recipe
+        function editRecipe(recipeId) {
+            window.location.href = `edit_recipe.html?id=${recipeId}`;
+        }
+
+        // share a recipe
+        function shareRecipe(recipeId) {
+            showToast('Sharing feature coming soon!', 'info');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProfileData();
+            loadUserRecipes();
+        });
     </script>
 </body>
 </html>
