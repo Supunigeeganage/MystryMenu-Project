@@ -155,7 +155,7 @@ header {
   padding-left: 20px;
 }
 .recipe-details::-webkit-scrollbar {
-    display: none; /* For Chrome, Safari, and Edge */
+    display: none; /* For Chrome, Safari, and Edge */  
 }
 
 .recipe-list {

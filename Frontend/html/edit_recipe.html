@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Recipe</title>
-    <link rel="stylesheet" href="../css/edit_recipe.css">
-    <link rel="stylesheet" href="../css/toast.css">
+    <link rel="stylesheet" href="../css/edit_recipe.css?v=1.0">
+    <link rel="stylesheet" href="../css/toast.css?v=1.0">
 </head>
 <body>
     <div class="container">
@@ -25,7 +25,7 @@
                 </div>               
             </div>
             <form class="form" id="editRecipeForm">
-                <div class="form-group">
+                <section class="form-groupsp">
                     <div class="form-group">
                         <label for="recipe-name">Recipe Name</label>
                         <input type="text" id="recipe-name" name="recipe-name" placeholder="Enter recipe name" required>
@@ -43,18 +43,18 @@
                             <option>Cakes</option>
                         </select>
                     </div>
-                    <div class="form-group">
+                    <div class="ingre">
                         <label for="ingredient">Ingredient</label>
-                        <input type="text" id="ingredient" name="ingredient" placeholder="Enter ingredients" required>
+                        <textarea id="ingredient" name="ingredient" placeholder="Enter ingredients" required></textarea>
                     </div>
-                    <div class="form-group">
+                    <div class="meth">
                         <label for="method">Method</label>
                         <textarea id="method" name="method" placeholder="Enter cooking method" required></textarea>
                     </div>
-                    <div class="button-group">
-                        <button type="button" class="cancel" onclick="window.history.back()">Cancel</button>
-                        <button type="submit" class="add">Update</button>
-                    </div>
+                </section>
+                <div class="button-group">
+                    <button type="button" class="cancel" onclick="window.history.back()">Cancel</button>
+                    <button type="submit" class="add">Update</button>
                 </div>
             </form>
         </div>
