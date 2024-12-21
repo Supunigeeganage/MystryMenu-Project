@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: rgba(255, 248, 229, 1);
+    background-color: rgba(120, 239, 248, 1);
     overflow: hidden;
 }
 
@@ -11,7 +11,7 @@ body {
 
 .sidebar {
     width: 17%;
-    background-color: #fff;
+    background-color: #000000;
     border-right: 1px solid #ccc;
     padding: 20px;
 }
@@ -28,6 +28,7 @@ body {
     font-size: 28px;
     margin-left: 80px;
     font-family: 'Times New Roman';
+    color: white;
 }
 
 .logo img {
@@ -92,8 +93,8 @@ header {
     display: grid;
     grid-template-columns: repeat(1, 1fr);
     gap: 20px;
-    padding: 10px;
     margin-bottom: 30px;
+    margin-left: 95px;
 }
 .recipes::-webkit-scrollbar {
     display: none; /* For Chrome, Safari, and Edge */
@@ -110,24 +111,12 @@ header {
     padding-left: 280px;
 }
 
-.recipe img {
-    width: 30%;
-    border-radius: 10px;
-}
-
 .recipe p {
-    margin-top: 10px;
+    margin-top: 70px;
     font-size: 16px;
     font-weight: bold;
     margin-left: 30px;
     margin-right: 30px;
-}
-.recipe p {
-    display: flex;
-    align-items: center;
-    font-size: 16px;
-    font-weight: bold;
-    margin-top: 10px;
 }
 .user{
     font-size: 33px;
@@ -147,6 +136,22 @@ header {
 .delete-btn:hover{
     background-color: red;
 }
+.view-btn {
+    height: 40px; /* Explicitly define the height */
+    padding: 10px 20px; /* Adjust padding for horizontal space */
+    margin-left: 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 30px;
+    background-color: rgb(7, 7, 7);
+    color: #fff;
+    font-size: 16px;
+    margin-top: 60px;
+    margin-right: 30px;
+}
+.view-btn:hover{
+    background-color: rgb(113, 98, 243);
+}
 .topic p{
     margin-top: 70px;
     font-size: 28px;
@@ -158,5 +163,54 @@ header {
 .admin p{
     margin-left: 950px;
     margin-top: 35px;
+}
+.menu {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+    margin-top: 100px;
+}
+
+.menu li {
+    margin: 15px 0;
+}
+
+.menu a {
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+}
+
+.menu a i {
+    margin-right: 20px;
+    margin-left: 10px;
+    font-size: 20px;
+    color: #000000;
+}
+
+.menu a:hover {
+    background-color: rgba(0, 255, 255, 0.2); /* Light green background */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow for box effect */
+    transform: scale(1.05); /* Slightly enlarge the item */
+    color: #007bff; /* Change text color on hover */
+}
+
+.menu a:hover i {
+    color: #007bff; /* Change icon color on hover */
+}
+.menu a.active {
+    background-color: rgba(68, 215, 252, 0.5); /* Slightly darker green for the locked state */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Stronger shadow */
+    transform: scale(1.05); /* Slightly enlarged */
+    color: #007bff; /* Blue text color */
+    font-weight: bold;
+}
+
+.menu a.active i {
+    color: #007bff; /* Match the icon color to the text */
 }
 
