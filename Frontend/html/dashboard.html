@@ -14,25 +14,15 @@
                 <h2><span class="gold">M</span>ystry<span class="gold">M</span>enu <img src="../image/logo.jpg" alt="Logo"></h2> 
             </div>
             <ul class="menu">
-                <li><a href="#" class="active"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="#"><i class="fas fa-utensils"></i> Breakfast</a></li>
-                <li><a href="#"><i class="fas fa-utensils"></i> Lunch</a></li>
-                <li><a href="#"><i class="fas fa-utensils"></i> Dinner</a></li>
-                <li><a href="#"><i class="fas fa-leaf"></i> Vegetarian</a></li>
-                <li><a href="#"><i class="fas fa-ice-cream"></i> Sweets</a></li>
-                <li><a href="#"><i class="fas fa-glass-martini-alt"></i> Drinks</a></li>
-                <li><a href="#"><i class="fas fa-birthday-cake"></i> Cakes</a></li>
+                <li><a href="#" class="active" data-type="all"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#" data-type="Breakfast"><i class="fas fa-utensils"></i> Breakfast</a></li>
+                <li><a href="#" data-type="Lunch"><i class="fas fa-utensils"></i> Lunch</a></li>
+                <li><a href="#" data-type="Dinner"><i class="fas fa-utensils"></i> Dinner</a></li>
+                <li><a href="#" data-type="Vegetarian"><i class="fas fa-leaf"></i> Vegetarian</a></li>
+                <li><a href="#" data-type="Sweets"><i class="fas fa-ice-cream"></i> Sweets</a></li>
+                <li><a href="#" data-type="Drinks"><i class="fas fa-glass-martini-alt"></i> Drinks</a></li>
+                <li><a href="#" data-type="Cakes"><i class="fas fa-birthday-cake"></i> Cakes</a></li>
             </ul>
-            <script>
-                const menuLinks = document.querySelectorAll('.menu a');
-                menuLinks.forEach(link => {
-                    link.addEventListener('click', () => {
-                        menuLinks.forEach(item => item.classList.remove('active'));
-                        link.classList.add('active');
-                    });
-                });
-            </script>
-            
         </aside>
         <main class="main-content">
             <header>
@@ -52,30 +42,7 @@
             </header>
             <br><br><br><br><br>
             <section class="recipes">
-                <div class="recipe">
-                    <img src="../image/recipe1.jpeg" alt="Recipe 1">
-                    <p><i class="fas fa-share-alt share-icon"></i>Recipe 1</p>
-                </div>
-                <div class="recipe">
-                    <img src="../image/recipe2.jpeg" alt="Recipe 2">
-                    <p><i class="fas fa-share-alt share-icon"></i>Recipe 2</p>
-                </div>
-                <div class="recipe">
-                    <img src="../image/recipe3.jpeg" alt="Recipe 3">
-                    <p><i class="fas fa-share-alt share-icon"></i>Recipe 3</p>
-                </div>
-                <div class="recipe">
-                    <img src="../image/recipe4.jpeg" alt="Recipe 4">
-                    <p><i class="fas fa-share-alt share-icon"></i>Recipe 4</p>
-                </div>
-                <div class="recipe">
-                    <img src="../image/recipe5.jpeg" alt="Recipe 5">
-                    <p><i class="fas fa-share-alt share-icon"></i>Recipe 5</p>
-                </div>
-                <div class="recipe">
-                    <img src="../image/recipe6.jpeg" alt="Recipe 6">
-                    <p><i class="fas fa-share-alt share-icon"></i>Recipe 6</p>
-                </div>
+                <!-- Recipes will be dynamically featch from backend and loaded here -->
             </section>
             
         </main>
@@ -111,6 +78,71 @@
         }
 
         document.addEventListener('DOMContentLoaded', loadProfilePicture);
+
+        function loadRecipes(type = 'all') {
+            fetch(`../../backend/getFilteredRecipes.php?type=${type}`)
+                .then(response => response.json())
+                .then(data => {
+                    const recipesSection = document.querySelector('.recipes');
+                    recipesSection.innerHTML = '';
+
+                    if (data.status === 'success' && data.recipes.length > 0) {
+                        data.recipes.forEach(recipe => {
+                            const recipeElement = document.createElement('div');
+                            recipeElement.className = 'recipe';
+                            recipeElement.innerHTML = `
+                                <img src="${recipe.image ? '../../backend' + recipe.image : '../image/recipe1.jpeg'}" 
+                                     alt="${recipe.name}"
+                                     onclick="viewRecipe(${recipe.recipe_id})"
+                                     style="cursor: pointer;"
+                                     onerror="this.src='../image/recipe1.jpeg'">
+                                <div class="recipe-info">
+                                    <span>${recipe.name}</span>
+                                    <i class="fas fa-share-alt share-icon" onclick="shareRecipe(${recipe.recipe_id})"></i>
+                                </div>
+                            `;
+                            recipesSection.appendChild(recipeElement);
+                        });
+                    } else {
+                        recipesSection.innerHTML = '<p>No recipes found for this category.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    recipesSection.innerHTML = '<p>Error loading recipes.</p>';
+                });
+        }
+
+        function shareRecipe(recipeId) {
+            fetch(`../../backend/getRecipeDetails.php?id=${recipeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        localStorage.setItem('sharedRecipe', JSON.stringify(data.recipe));
+                        localStorage.setItem('returnTo', 'dashboard');
+                        window.location.href = `share_recipe.html?id=${recipeId}`;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        
+        function viewRecipe(recipeId) {
+            window.location.href = `recipe_view.html?id=${recipeId}`;
+        }
+
+        // Update menu click
+        const menuLinks = document.querySelectorAll('.menu a');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                menuLinks.forEach(item => item.classList.remove('active'));
+                link.classList.add('active');
+                
+                const type = link.getAttribute('data-type');
+                loadRecipes(type);
+            });
+        });
+        document.addEventListener('DOMContentLoaded', () => loadRecipes('all'));
     </script>
 </body>
 </html>

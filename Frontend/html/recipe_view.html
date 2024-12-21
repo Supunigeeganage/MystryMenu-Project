@@ -15,25 +15,9 @@
                 <h2><span class="gold">M</span>ystry<span class="gold">M</span>enu <img src="../image/logo.jpg" alt="Logo" class="logimg"></h2> 
                 <section class="related-recipes">
                     <div class="recipe-list">
-                        <div class="recipe">
-                            <img src="../image/recipe1.jpeg" alt="Recipe 1">
-                            <a href=""><p>Recipe 1</p></a>
-                        </div>
-                        <div class="recipe">
-                            <img src="../image/recipe2.jpeg" alt="Recipe 2">
-                            <a href=""><p>Recipe 2</p></a>
-                        </div>
-                        <div class="recipe">
-                            <img src="../image/recipe3.jpeg" alt="Recipe 3">
-                            <a href=""><p>Recipe 3</p></a>
-                        </div>
-                        <div class="recipe">
-                            <img src="../image/recipe5.jpeg" alt="Recipe 3">
-                            <a href=""><p>Recipe 5</p></a>
-                        </div>
+                        <!--sidebar recipes will be loaded here from the backend db dynamically -->
                     </div>
                 </section>
-        
             </div>
         </aside>
         <main class="main-content">
@@ -43,54 +27,25 @@
                     <button><i class="fas fa-search" style="color: rgb(190, 190, 190);"></i></button>
                 </div>
                 <div class="header-icons">
-                    <i class="fas fa-user-circle"></i>
+                    <a href="./profile.html">
+                        <img src="../image/profile-pic.png" alt="" id="profile-pic" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
+                    </a>
                 </div>
                 <br>
             </header>
             <div class="recipe-name">
-                <p>Recipe Name</p>
+                <p></p>
             </div>
             <div class="view">
                 <section class="recipe-details">
-                    <input type="text"><p style="font-weight: bold; font-size: 20px;">Ingredients</p>
                     <img src="../image/recipe4.jpeg" alt="Recipe Image">
-                    <p style="font-family: 'Times New Roman', Times, serif; font-size: 18px;">1 pound lean ground beef
-
-                        ½ cup bread crumbs
+                    <div class="recipe-content">
+                        <h2 class="section-heading">Ingredients</h2>
+                        <div id="recipe-ingredients" class="ingredient-list"></div>
                         
-                        3 tablespoons minced onion
-                        
-                        2 tablespoons water
-                        
-                        1 large egg
-                        
-                        1 (8 ounce) can jellied cranberry sauce
-                        
-                        ¾ cup chili sauce
-                        
-                        1 tablespoon brown sugar
-                        
-                        1 ½ teaspoons lemon juice
-
-                        <br>
-                        <p style="font-weight: bold; font-size: 20px;"> recipe method description</p>
-
-                        Directions
-                        Gather the ingredients. Preheat the oven to 350 degrees F (175 degrees C).
-                        
-                        Mix ground beef, bread crumbs, onion, water, and egg together in a large bowl. Form into small meatballs and arrange on a nonstick baking sheet. Bake in the preheated oven for 20 to 25 minutes, turning once.
-                        
-                        Stir cranberry sauce, chili sauce, brown sugar, and lemon juice together in a large saucepan over low heat until smooth. Add meatballs; simmer for 1 hour before serving.Directions
-                        Gather the ingredients. Preheat the oven to 350 degrees F (175 degrees C).
-
-                        Mix ground beef, bread crumbs, onion, water, and egg together in a large bowl. Form into small meatballs and arrange on a nonstick baking sheet. Bake in the preheated oven for 20 to 25 minutes, turning once.
-
-                        Stir cranberry sauce, chili sauce, brown sugar, and lemon juice together in a large saucepan over low heat until smooth. Add meatballs; simmer for 1 hour before serving.Directions
-                        Gather the ingredients. Preheat the oven to 350 degrees F (175 degrees C).
-
-                        Mix ground beef, bread crumbs, onion, water, and egg together in a large bowl. Form into small meatballs and arrange on a nonstick baking sheet. Bake in the preheated oven for 20 to 25 minutes, turning once.
-
-                        Stir cranberry sauce, chili sauce, brown sugar, and lemon juice together in a large saucepan over low heat until smooth. Add meatballs; simmer for 1 hour before serving.</p>
+                        <h2 class="section-heading">Recipe Method Description</h2>
+                        <div id="recipe-method" class="method-description"></div>
+                    </div>
                     <div class="actions">
                         <button class="heart-btn"><i class="fas fa-heart"></i></button>
                         <script>
@@ -111,5 +66,94 @@
             </div>
         </main>
     </div>
+    <script>
+    function loadRelatedRecipes() {
+        fetch('../../backend/getFilteredRecipes.php?type=all')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const recipeList = document.querySelector('.recipe-list');
+                    recipeList.innerHTML = '';
+
+                    const recipes = data.recipes.slice(0, 10);
+                    
+                    recipes.forEach(recipe => {
+                        const recipeElement = document.createElement('div');
+                        recipeElement.className = 'recipe';
+                        recipeElement.innerHTML = `
+                            <img src="${recipe.image ? '../../backend' + recipe.image : '../image/recipe1.jpeg'}" 
+                                 alt="${recipe.name}"
+                                 onclick="viewRecipe(${recipe.recipe_id})"
+                                 style="cursor: pointer;"
+                                 onerror="this.src='../image/recipe1.jpeg'">
+                            <p>${recipe.name}</p>
+                        `;
+                        recipeList.appendChild(recipeElement);
+                    });
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    //  view recipe Function 
+    function viewRecipe(recipeId) {
+        window.location.href = `recipe_view.html?id=${recipeId}`;
+    }
+
+    function loadProfilePicture() {
+        fetch('../../backend/get_user_profile.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.profilePicture) {
+                    const profilePicElement = document.querySelector('.header-icons img');
+                    profilePicElement.src = '../../backend' + data.profilePicture;
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching profile picture:', error);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadProfilePicture();
+        loadRelatedRecipes();
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('id');
+
+        if (recipeId) {
+            fetch(`../../backend/getRecipeDetails.php?id=${recipeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const recipe = data.recipe;
+                        
+                        document.querySelector('.recipe-name p').textContent = recipe.name;
+                        
+                        const recipeImage = document.querySelector('.recipe-details img');
+                        recipeImage.src = recipe.image ? '../../backend' + recipe.image : '../image/recipe4.jpeg';
+                        
+                        document.getElementById('recipe-ingredients').innerHTML = formatIngredients(recipe.ingredient);
+                        document.getElementById('recipe-method').innerHTML = formatMethod(recipe.method);
+                    } else {
+                        console.error('Error loading recipe:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    });
+
+    function formatIngredients(ingredients) {
+        return ingredients.split('\n')
+            .filter(ingredient => ingredient.trim())
+            .map(ingredient => `<p>${ingredient.trim()}</p>`)
+            .join('');
+    }
+
+    function formatMethod(method) {
+        return method.split('\n')
+    }
+    </script>
 </body>
 </html>

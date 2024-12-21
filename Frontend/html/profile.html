@@ -61,7 +61,7 @@
         }
         document.addEventListener('DOMContentLoaded', loadProfileData);
         
-        //delete use profile
+        //delete user profile
         document.addEventListener('DOMContentLoaded', function() {
             const deleteLink = document.querySelector('.delete-profile');
             
@@ -169,7 +169,7 @@
                 .then(data => {
                     if (data.status === 'success') {
                         showToast('Recipe deleted successfully', 'success');
-                        loadUserRecipes(); // Reload the recipes
+                        loadUserRecipes();
                     } else {
                         showToast(data.message, 'error');
                     }
@@ -188,7 +188,15 @@
 
         // share a recipe
         function shareRecipe(recipeId) {
-            showToast('Sharing feature coming soon!', 'info');
+            fetch(`../../backend/getRecipeDetails.php?id=${recipeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        localStorage.setItem('sharedRecipe', JSON.stringify(data.recipe));
+                        window.location.href = `share_recipe.html?id=${recipeId}`;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
         document.addEventListener('DOMContentLoaded', function() {
             loadProfileData();
