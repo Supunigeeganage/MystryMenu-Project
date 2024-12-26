@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="../css/recipe_view.css?v=2.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="../css/toast.css">
+  <script src="../utility/SearchRecipes.js"></script>
 </head>
 <body>
     <div class="container">
@@ -23,8 +24,11 @@
         <main class="main-content">
             <header>
                 <div class="search-bar">
-                    <input type="text" placeholder="Search">
-                    <button><i class="fas fa-search" style="color: rgb(190, 190, 190);"></i></button>
+                    <input type="text" placeholder="Search" id="searchInput" 
+                           onkeyup="if (event.key === 'Enter') redirectToSearch(this.value)">
+                    <button onclick="redirectToSearch(document.getElementById('searchInput').value)">
+                        <i class="fas fa-search" style="color: rgb(190, 190, 190);"></i>
+                    </button>
                 </div>
                 <div class="header-icons">
                     <a href="./save_recipe.html"<i class="fas fa-download download" style="margin-top: 5px;"></i></a>
@@ -69,6 +73,9 @@
                 </section>
             </div>
         </main>
+    </div>
+    <div class="recipes">
+        <!-- Search results will appear here -->
     </div>
     <script>
     function loadRelatedRecipes() {
@@ -221,6 +228,12 @@
             saveRecipe(recipeId);
         }
     });
+
+    function redirectToSearch(searchTerm) {
+        if (searchTerm.trim()) {
+            window.location.href = `dashboard.html?search=${encodeURIComponent(searchTerm)}`;
+        }
+    }
     </script>
     <div id="toast" class="toast"></div>
 </body>
