@@ -4,27 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Save Recipes</title>
-  <link rel="stylesheet" href="../css/save_recipe.css?v=1.0">
+  <link rel="stylesheet" href="../css/save_recipe.css?v=6.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="../css/toast.css">
 </head>
 <body>
     <div class="container">
         <aside class="sidebar">
             <div class="logo">
-                <h2><span class="gold">M</span>ystry<span class="gold">M</span>enu <img src="../image/logo.jpg" alt="Logo" class="logimg"></h2> 
-                <section class="related-recipes">
-                    <div class="recipe-list">
-                        <div class="last">
-                            <h1>Last Saved</h1>
-                            <img src="../image/recipe5.jpeg" alt="">
-                            <div class="rep">
-                                <p>Recipe 5</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-        
+                <h2><span class="gold">M</span>ystry<span class="gold">M</span>enu <a href="./dashboard.html"><img src="../image/logo.jpg" alt="Logo" class="logimg"></a></h2> 
             </div>
+            <section class="related-recipes">
+                <div class="recipe-list">
+                    <div class="last">
+                        <h1>Last Saved Recipe</h1>
+                        <!-- Last saved recipe will be loaded here -->
+                    </div>
+                </div>
+            </section>
         </aside>
         <main class="main-content">
             <header>
@@ -33,55 +30,139 @@
                     <button><i class="fas fa-search" style="color: rgb(190, 190, 190);"></i></button>
                 </div>
                 <div class="header-icons">
-                    <i class="fas fa-user-circle"></i>
+                    <a href="./profile.html">
+                        <i class="fas fa-user-circle" id="default-profile"></i>
+                        <img src="" alt="" id="profile-pic">
+                    </a>
                 </div>
                 <br>
             </header>
             <div class="save-recipe">
-                <img src="../image/save.png" alt=""><p>Save Recipes</p>
+                <img src="../image/save.png" alt=""><p>Saved Recipes</p>
             </div>
             <section class="content">
- 
                 <div class="recipe-container">
-                  <div class="recipe">
-                    <img src="../image/recipe1.jpeg" alt="Recipe 1">        
-                    <p><i class="fas fa-trash-alt delete-icon"></i>Recipe 1</p>
-                  </div>
-                  <div class="recipe">
-                    <img src="../image/recipe2.jpeg" alt="Recipe 2">
-                    <p><i class="fas fa-trash-alt delete-icon"></i>Recipe 2</p>
-                  </div>
-                  <div class="recipe">
-                    <img src="../image/recipe3.jpeg" alt="Recipe 3">
-                    <p><i class="fas fa-trash-alt delete-icon"></i>Recipe 3</p>
-                  </div>
-                  <div class="recipe">
-                    <img src="../image/recipe1.jpeg" alt="Recipe 1">
-                    <p><i class="fas fa-trash-alt delete-icon"></i>Recipe 1</p>
-                  </div>
-                  <div class="recipe">
-                    <img src="../image/recipe2.jpeg" alt="Recipe 2">
-                    <p><i class="fas fa-trash-alt delete-icon"></i>Recipe 2</p>
-                  </div>
-                  <div class="recipe">
-                    <img src="../image/recipe3.jpeg" alt="Recipe 3">
-                    <p><i class="fas fa-trash-alt delete-icon"></i>Recipe 3</p>
-                  </div>
-                  <div class="recipe">
-                    <img src="../image/recipe1.jpeg" alt="Recipe 1">
-                    <p><i class="fas fa-trash-alt delete-icon"></i>Recipe 1</p>
-                  </div>
-                  <div class="recipe">
-                    <img src="../image/recipe2.jpeg" alt="Recipe 2">
-                    <p><i class="fas fa-trash-alt delete-icon"></i>Recipe 2</p>
-                  </div>
-                  <div class="recipe">
-                    <img src="../image/recipe3.jpeg" alt="Recipe 3">
-                    <p><i class="fas fa-trash-alt delete-icon"></i>Recipe 3</p>
-                  </div>
+                    <!-- Saved recipes will be dynamically loaded here -->
                 </div>
-              </section>
+            </section>
         </main>
     </div>
+    <div id="toast" class="toast"></div>
+    <script>
+    function showToast(message, type = 'error') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `toast ${type}`;
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+
+    function deleteRecipe(recipeId) {
+        if (confirm('Are you sure you want to remove this recipe from saved recipes?')) {
+            fetch('../../backend/removeSavedRecipe.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `recipe_id=${recipeId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showToast('Recipe removed successfully', 'success');
+                    loadSavedRecipes();
+                } else {
+                    showToast(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error removing recipe');
+            });
+        }
+    }
+
+    function loadSavedRecipes() {
+        fetch('../../backend/getSavedRecipes.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // last saved recipes
+                    const lastRecipeDiv = document.querySelector('.last');
+                    if (data.lastSaved) {
+                        lastRecipeDiv.innerHTML = `
+                            <h1>Last Saved Recipe</h1>
+                            <img src="${data.lastSaved.image ? '../../backend' + data.lastSaved.image : '../image/recipe1.jpeg'}" 
+                                 alt="${data.lastSaved.name}"
+                                 onclick="window.location.href='./recipe_view.html?id=${data.lastSaved.recipe_id}'"
+                                 style="cursor: pointer;"
+                                 onerror="this.src='../image/recipe1.jpeg'">
+                            <div class="rep">
+                                <p onclick="window.location.href='./recipe_view.html?id=${data.lastSaved.recipe_id}'" 
+                                   style="cursor: pointer; font-weight: bold;">${data.lastSaved.name}</p>
+                            </div>
+                        `;
+                    }
+
+                    // all saved recipes
+                    const container = document.querySelector('.recipe-container');
+                    container.innerHTML = '';
+                    
+                    if (data.recipes.length === 0) {
+                        container.innerHTML = '<h1>No saved recipes found.</h1>';
+                        return;
+                    }
+                    
+                    data.recipes.forEach(recipe => {
+                        const recipeElement = document.createElement('div');
+                        recipeElement.className = 'recipe';
+                        recipeElement.innerHTML = `
+                            <img src="${recipe.image ? '../../backend' + recipe.image : '../image/recipe1.jpeg'}" 
+                                 alt="${recipe.name}"
+                                 onclick="window.location.href='./recipe_view.html?id=${recipe.recipe_id}'"
+                                 style="cursor: pointer;"
+                                 onerror="this.src='../image/recipe1.jpeg'">
+                            <div class="recipe-details">
+                                <i class="fas fa-trash-alt delete-icon" onclick="deleteRecipe(${recipe.recipe_id})"></i>
+                                <span onclick="window.location.href='./recipe_view.html?id=${recipe.recipe_id}'" 
+                                      style="cursor: pointer; font-weight: bold;">${recipe.name}</span>
+                            </div>
+                        `;
+                        container.appendChild(recipeElement);
+                    });
+                } else {
+                    showToast(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error loading recipes');
+            });
+    }
+
+    function loadProfilePicture() {
+        fetch('../../backend/get_user_profile.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.profilePicture) {
+                    const profilePicElement = document.getElementById('profile-pic');
+                    const defaultProfile = document.getElementById('default-profile');
+                    profilePicElement.src = '../../backend' + data.profilePicture;
+                    profilePicElement.style.display = 'inline';
+                    defaultProfile.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+        
+    document.addEventListener('DOMContentLoaded', () => {
+        loadProfilePicture();
+        loadSavedRecipes();
+    });
+    </script>
 </body>
 </html>

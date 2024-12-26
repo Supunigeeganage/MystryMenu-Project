@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
 
     if (empty($email)) {
-        header('Location: ../frontend/html/forgot_password.html?error=1');
+        header('Location: ../frontend/html/forgot_password.html?error=Empty_email');
         exit;
     }
 

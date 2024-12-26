@@ -4,15 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MystryMenu</title>
-  <link rel="stylesheet" href="../css/recipe_view.css?v=1.0">
+  <link rel="stylesheet" href="../css/recipe_view.css?v=2.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+  <link rel="stylesheet" href="../css/toast.css">
 </head>
 <body>
     <div class="container">
         <aside class="sidebar">
             <div class="logo">
-                <h2><span class="gold">M</span>ystry<span class="gold">M</span>enu <img src="../image/logo.jpg" alt="Logo" class="logimg"></h2> 
+                <h2><span class="gold">M</span>ystry<span class="gold">M</span>enu <a href="./dashboard.html"><img src="../image/logo.jpg" alt="Logo" class="logimg"></h2> </a> 
                 <section class="related-recipes">
                     <div class="recipe-list">
                         <!--sidebar recipes will be loaded here from the backend db dynamically -->
@@ -27,8 +27,10 @@
                     <button><i class="fas fa-search" style="color: rgb(190, 190, 190);"></i></button>
                 </div>
                 <div class="header-icons">
+                    <a href="./save_recipe.html"<i class="fas fa-download download" style="margin-top: 5px;"></i></a>
                     <a href="./profile.html">
-                        <img src="../image/profile-pic.png" alt="" id="profile-pic" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
+                        <i class="fas fa-user-circle" id="default-profile"></i>
+                        <img src="" alt="" id="profile-pic">
                     </a>
                 </div>
                 <br>
@@ -38,7 +40,6 @@
             </div>
             <div class="view">
                 <section class="recipe-details">
-                    <p style="font-weight: bold; font-size: 20px;">Ingredients</p>
                     <img src="../image/recipe4.jpeg" alt="Recipe Image">
                     <div class="recipe-content">
                         <h2 class="section-heading">Ingredients</h2>
@@ -55,7 +56,7 @@
                             });
                         </script>
                         <button><i class="fas fa-download download-icon"></i></button>
-                        <button><i class="fas fa-share-alt share-icon"></i></button>
+                        <a href="./share_recipe.html"><button><i class="fas fa-share-alt share-icon"></i></button></a>
                     </div>
                     <section class="feedback">
                         <h3>Feedback</h3>
@@ -108,15 +109,18 @@
             .then(response => response.json())
             .then(data => {
                 if (data && data.profilePicture) {
-                    const profilePicElement = document.querySelector('.header-icons img');
+                    const profilePicElement = document.getElementById('profile-pic');
+                    const defaultProfile = document.getElementById('default-profile');
                     profilePicElement.src = '../../backend' + data.profilePicture;
+                    profilePicElement.style.display = 'inline';
+                    defaultProfile.style.display = 'none';
                 }
             })
             .catch(error => {
-                console.error('Error fetching profile picture:', error);
+                console.error('Error:', error);
             });
     }
-
+    
     document.addEventListener('DOMContentLoaded', function() {
         loadProfilePicture();
         loadRelatedRecipes();
@@ -157,6 +161,67 @@
     function formatMethod(method) {
         return method.split('\n')
     }
+
+    function showToast(message, type = 'error') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `toast ${type}`;
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+
+    function saveRecipe(recipeId) {
+        fetch('../../backend/saveRecipe.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `recipe_id=${recipeId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'own_recipe') {
+                const confirmSave = confirm('This is your own recipe. Are you sure you want to save it to your collection?');
+                if (confirmSave) {
+                    fetch('../../backend/saveRecipe.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `recipe_id=${recipeId}&force_save=true`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            showToast('Recipe saved successfully', 'success');
+                        } else {
+                            showToast(data.message, 'error');
+                        }
+                    });
+                }
+            } else if (data.status === 'success') {
+                showToast('Recipe saved successfully', 'success');
+            } else {
+                showToast(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error saving recipe', 'error');
+        });
+    }
+
+    // download button
+    document.querySelector('.download-icon').addEventListener('click', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('id');
+        if (recipeId) {
+            saveRecipe(recipeId);
+        }
+    });
     </script>
+    <div id="toast" class="toast"></div>
 </body>
 </html>

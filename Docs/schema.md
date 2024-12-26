@@ -1,7 +1,7 @@
 ```mermaid
 erDiagram
     User {
-        UUID user_id PK
+        INT user_id PK
         VARCHAR firstName
         VARCHAR lastName
         enum gender "Male, Female"
@@ -13,7 +13,7 @@ erDiagram
     }
     
     Recipe {
-        UUID recipe_id PK
+        INT  recipe_id PK
         VARCHAR name
         enum type "Breakfast, Lunch, Dinner, Vegetarian, Sweets, Drinks, Cakes"
         TEXT ingredient
@@ -23,16 +23,16 @@ erDiagram
     }
     
     Comments {
-        UUID commentid PK
+        INT commentid PK
         UUID user_id FK
         UUID recipe_id FK
         TEXT comment
     }
     
     SaveRecipe {
-        UUID save_id PK
-        UUID recipe_id FK
-        UUID user_id FK
+        INT recipe_id FK
+        INT user_id FK
+        timestamp saved_at
     }
     
     User ||--o{ Comments : "can give"

@@ -60,7 +60,6 @@ header {
     color: #000;
     cursor: pointer;
     margin-left: 980px;
-    
 }
 .header-icons i:hover {
     background-color: rgba(200, 200, 200, 0.5); /* Change to the desired color */
@@ -210,4 +209,21 @@ header {
     padding-bottom: 20px;
     padding-top: 20px;
     background-color: #e6e2e2;
+}
+
+.recipe-list{
+    align-items: center;
+    text-align: center;
+}
+
+#profile-pic {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: none;
+}
+
+#default-profile {
+    font-size: 45px;
 }
