@@ -37,7 +37,7 @@
                 <br>
                 
                 <div class="auth-buttons">
-                    <button class="login-btn">Beginner</button>
+                    <button class="login-btn" onclick="filterBeginnerRecipes()">Beginner</button>
                 </div>          
             </header>
             <br><br><br><br><br>
@@ -130,7 +130,7 @@
             window.location.href = `recipe_view.html?id=${recipeId}`;
         }
 
-        // Update menu click
+        // menu links
         const menuLinks = document.querySelectorAll('.menu a');
         menuLinks.forEach(link => {
             link.addEventListener('click', (e) => {
@@ -143,6 +143,40 @@
             });
         });
         document.addEventListener('DOMContentLoaded', () => loadRecipes('all'));
+
+        function filterBeginnerRecipes() {
+            fetch('../../backend/getFilteredRecipes.php?type=beginner')
+                .then(response => response.json())
+                .then(data => {
+                    const recipesSection = document.querySelector('.recipes');
+                    recipesSection.innerHTML = '';
+
+                    if (data.status === 'success' && data.recipes.length > 0) {
+                        data.recipes.forEach(recipe => {
+                            const recipeElement = document.createElement('div');
+                            recipeElement.className = 'recipe';
+                            recipeElement.innerHTML = `
+                                <img src="${recipe.image ? '../../backend' + recipe.image : '../image/recipe1.jpeg'}" 
+                                     alt="${recipe.name}"
+                                     onclick="viewRecipe(${recipe.recipe_id})"
+                                     style="cursor: pointer;"
+                                     onerror="this.src='../image/recipe1.jpeg'">
+                                <div class="recipe-info">
+                                    <i class="fas fa-share-alt share-icon" onclick="shareRecipe(${recipe.recipe_id})"></i>
+                                    <span style="font-weight: bold;">${recipe.name}</span>
+                                </div>
+                            `;
+                            recipesSection.appendChild(recipeElement);
+                        });
+                    } else {
+                        recipesSection.innerHTML = '<p>No beginner-friendly recipes found.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    recipesSection.innerHTML = '<p>Error loading recipes.</p>';
+                });
+        }
     </script>
 </body>
 </html>

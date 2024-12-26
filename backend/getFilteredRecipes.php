@@ -4,7 +4,16 @@ require 'db.php';
 $type = $_GET['type'] ?? 'all';
 
 try {
-    if ($type === 'all') {
+    //when begineer button clicks its filter recipes with less than 4 comma seperated ingredients
+    if ($type === 'beginner') {
+        $stmt = $pdo->prepare("
+            SELECT recipe_id, name, image, type, ingredient, method 
+            FROM recipe 
+            WHERE LENGTH(ingredient) - LENGTH(REPLACE(ingredient, ',', '')) < 4
+        ");
+        $stmt->execute();
+    //load all recipes
+    } else if ($type === 'all') {
         $stmt = $pdo->prepare("SELECT recipe_id, name, image, type, ingredient, method FROM recipe");
         $stmt->execute();
     } else {
