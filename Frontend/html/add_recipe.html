@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Recipe</title>
-    <link rel="stylesheet" href="../css/add_recipe.css">
-    <link rel="stylesheet" href="../css/toast.css">
+    <link rel="stylesheet" href="../css/add_recipe.css?v=1.2">
+    <link rel="stylesheet" href="../css/toast.css?v=1.2">
 </head>
 <body>
     <div class="container">
@@ -22,10 +22,10 @@
                             <div class="upload-placeholder">
                                 <img id="preview" src="../image/addimg.png" alt="Recipe Image" class="add-image-icon">
                                 <input type="file" id="image-upload" name="recipe-image" accept="image/*">
-                                <label for="image-upload">Add Recipe Image</label>
+                                <span id="image-label">Add Recipe Image</span>
                             </div>
                         </label>
-                    </div>
+                    </div>                    
                 </div>               
             </div>
             <form id="recipeForm" class="form" action="../../backend/addRecipe.php" method="post" enctype="multipart/form-data">
@@ -45,7 +45,7 @@
                           <option>Sweets</option>
                           <option>Drinks</option>
                           <option>Cakes</option>
-                        </select>
+                        </select> 
                     </div>
                     <div class="form-group">
                         <label for="ingredient">Ingredient</label>
@@ -118,6 +118,31 @@
                 toast.style.display = 'none';
             }, 3000);
         }
+        function previewImage(input) {
+    const label = document.getElementById('image-label'); // Access the label element
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById('preview').src = e.target.result; // Set the preview image
+            if (label) {
+                label.classList.add('hidden'); // Add 'hidden' class to hide the label
+            }
+        };
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        // Reset to default state if no file is selected
+        if (label) {
+            label.classList.remove('hidden'); // Remove 'hidden' class to show the label
+        }
+        document.getElementById('preview').src = '../image/addimg.png'; // Reset to default image
+    }
+}
+
+document.getElementById('image-upload').addEventListener('change', function () {
+    previewImage(this);
+});
+
+
     </script>
     <div id="toast" class="toast"></div>
 </body>
