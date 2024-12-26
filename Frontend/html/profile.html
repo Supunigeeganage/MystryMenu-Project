@@ -141,8 +141,11 @@
                             recipeElement.innerHTML = `
                                 <img src="${recipe.image ? '../../backend' + recipe.image : '../image/recipe1.jpeg'}" 
                                      alt="${recipe.name}" 
+                                     onclick="window.location.href='recipe_view.html?id=${recipe.recipe_id}'"
+                                     style="cursor: pointer;"
                                      onerror="this.src='../image/recipe1.jpeg'">
-                                <p>${recipe.name}</p>
+                                <p onclick="window.location.href='recipe_view.html?id=${recipe.recipe_id}'" 
+                                   style="cursor: pointer;">${recipe.name}</p>
                                 <i class="fas fa-edit edit-icon" onclick="editRecipe(${recipe.recipe_id})"></i>
                                 <i class="fas fa-share-alt share-icon" onclick="shareRecipe(${recipe.recipe_id})"></i>
                                 <i class="fas fa-trash-alt delete-icon" onclick="deleteRecipe(${recipe.recipe_id})"></i>
