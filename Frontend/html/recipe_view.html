@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MystryMenu</title>
-  <link rel="stylesheet" href="../css/recipe_view.css?v=2.0">
+  <link rel="stylesheet" href="../css/recipe_view.css?v=3.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="../css/toast.css">
   <script src="../utility/SearchRecipes.js"></script>
@@ -64,12 +64,13 @@
                     </div>
                     <section class="feedback">
                         <h3>Feedback</h3>
-                        <textarea placeholder="Add your feedback"></textarea>
+                        <textarea id="commentInput" placeholder="Add your feedback"></textarea>
                         <br>
-                        <button>Add</button>
+                        <button onclick="addComment()">Add</button>
+                        <div id="commentsList">
+                            <!-- Comments will be loaded here -->
+                        </div>
                     </section>
-                    <p>comment1</p><br>
-                    <p>comment2</p>
                 </section>
             </div>
         </main>
@@ -234,6 +235,81 @@
             window.location.href = `dashboard.html?search=${encodeURIComponent(searchTerm)}`;
         }
     }
+
+    // To add a new comment
+    function addComment() {
+        const commentText = document.getElementById('commentInput').value;
+        if (!commentText.trim()) {
+            showToast('Please enter a comment');
+            return;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('id');
+
+        fetch('../../backend/addFeedback.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                recipe_id: recipeId,
+                comment: commentText
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showToast('Comment added successfully', 'success');
+                document.getElementById('commentInput').value = '';
+                loadComments();
+            } else if (data.message === 'not_logged_in') {
+                window.location.href = 'signup.html';
+            } else {
+                showToast(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error adding comment', 'error');
+        });
+    }
+
+    // load comments
+    function loadComments() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('id');
+        const commentsList = document.getElementById('commentsList');
+        
+        commentsList.innerHTML = '';
+
+        fetch(`../../backend/getComments.php?recipe_id=${recipeId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    data.comments.forEach(comment => {
+                        const commentDiv = document.createElement('div');
+                        commentDiv.className = 'comment';
+                        commentDiv.innerHTML = `
+                            <div class="comment-header">
+                                <span class="username">${comment.firstName || ''} ${comment.lastName || ''}</span>
+                            </div>
+                            <div class="comment-content">
+                                <p>${comment.comment}</p>
+                            </div>
+                        `;
+                        commentsList.appendChild(commentDiv);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error loading comments', 'error');
+            });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        loadComments();
+    });
     </script>
     <div id="toast" class="toast"></div>
 </body>

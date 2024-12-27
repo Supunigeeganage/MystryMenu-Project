@@ -237,3 +237,92 @@ header {
 #default-profile {
     font-size: 45px;
 }
+
+.comment {
+    margin: 10px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.comment-header {
+    margin-bottom: 8px;
+}
+
+.username {
+    font-weight: bold;
+    color: #0056b3;
+}
+
+.comment-content p {
+    margin: 0;
+    color: #212529;
+}
+
+#commentsList {
+    margin-top: 20px;
+}
+
+.feedback {
+    margin-top: 30px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.comment {
+    margin: 15px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.comment-profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+}
+
+.username {
+    font-weight: bold;
+    color: #0056b3;
+}
+
+.comment-content p {
+    margin: 0;
+    color: #212529;
+}
+
+#commentInput {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.feedback button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.feedback button:hover {
+    background-color: #218838;
+}

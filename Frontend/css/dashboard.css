@@ -205,12 +205,13 @@ header {
 }
 
 .recipe {
-    text-align: center;
+    text-align: left; /* Override any center alignment */
 }
 
 .recipe img {
     width: 80%;
     border-radius: 10px;
+    cursor: pointer;
 }
 
 .recipe p {
@@ -226,17 +227,46 @@ header {
     margin-top: 10px;
 }
 
+.recipe-info {
+    display: flex;
+    align-items: flex-start;
+    padding: 10px;
+    width: 80%;
+}
+
 .share-icon {
     font-size: 20px;
     color: #000000;
-    margin-right: 80px; /* Space between icon and recipe name */
-    margin-left: 40px;
+    margin-right: 10px;
     cursor: pointer;
+    flex-shrink: 0;
+    margin-left: 0;
+    padding-right: 20px;
 }
 
 .share-icon:hover {
-    color: #0056b3; /* Darker blue on hover */
+    color: #0056b3;
 }
+
+.recipe-info span {
+    word-wrap: break-word;
+    font-weight: bold;
+    margin-left: 0;
+    cursor: pointer;
+}
+
+/* When text is too long, wrap to next line */
+@media (max-width: 100%) {
+    .recipe-info {
+        flex-wrap: wrap;
+    }
+    
+    .recipe-info span {
+        width: 100%;
+        margin-top: 5px;
+    }
+}
+
 .header-icons img{
     width: 45px;
     height: 45px;
@@ -245,47 +275,3 @@ header {
 .download{
     margin-top: 5px;
 }
-
-/* Toast styling */
-.toast {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #333;
-    color: white;
-    padding: 15px 25px;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    display: none;
-    z-index: 1000;
-    animation: slideIn 0.5s, fadeOut 0.5s 2.5s;
-}
-
-.toast.success {
-    background-color: #40C364;
-}
-
-.toast.error {
-    background-color: #dc3545;
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes fadeOut {
-    from {
-        opacity: 1;
-    }
-    to {
-        opacity: 0;
-    }
-}
-
