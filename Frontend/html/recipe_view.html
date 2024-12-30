@@ -310,6 +310,26 @@
     document.addEventListener('DOMContentLoaded', function() {
         loadComments();
     });
+
+    // share recipe
+    function shareRecipe(recipeId) {
+        fetch(`../../backend/getRecipeDetails.php?id=${recipeId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    localStorage.setItem('sharedRecipe', JSON.stringify(data.recipe));
+                    localStorage.setItem('returnTo', 'recipe_view');
+                    window.location.href = `share_recipe.html?id=${recipeId}`;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+    document.querySelector('.share-icon').parentElement.onclick = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('id');
+        shareRecipe(recipeId);
+        return false;
+    };
     </script>
     <div id="toast" class="toast"></div>
 </body>
