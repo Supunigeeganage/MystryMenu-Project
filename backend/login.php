@@ -11,7 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Check if email and password are provided
     if (empty($email) || empty($password)) {
         http_response_code(400);
-        echo json_encode(['error' => 'Email and password are required.']);
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => 'Email and password are required.']);
         exit;
     }
 
@@ -20,32 +21,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("SELECT id, password_hash, user_type FROM Users WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if (!$user) {
+
+        if (!$user || !password_verify($password, $user['password_hash'])) {
             http_response_code(401);
-            echo json_encode(['error' => 'Invalid email or password.']);
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'error', 'message' => 'Invalid email or password.']);
             exit;
         }
 
-        // Verify the password
-        if (password_verify($password, $user['password_hash'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_email'] = $email;
-            $_SESSION['user_type'] = $user['user_type'];
+        // Login successful
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_email'] = $email;
+        $_SESSION['user_type'] = $user['user_type'];
+        http_response_code(200);
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Login successful',
+            'user_type' => $user['user_type']
+        ]);
+        exit;
 
-            http_response_code(200);
-            echo json_encode(['message' => 'Login successful']);
-            exit;
-        } else {
-            http_response_code(401);
-            echo json_encode(['error' => 'Invalid email or password.']);
-            exit;
-        }
     } catch (PDOException $e) {
         http_response_code(500);
-        echo json_encode(['error' => 'Something went wrong.']);
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => 'Database error']);
         exit;
     }
+} else {
+    http_response_code(405);
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'error', 'message' => 'Method not allowed']);
+    exit;
 }
-
 ?>

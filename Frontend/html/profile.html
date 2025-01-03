@@ -21,7 +21,7 @@
                 <li><a href="./edit_profile.html"><i class="fas fa-edit"></i> Edit</a></li>
                 <li><a href="" class="delete-profile"><i class="fas fa-trash-alt"></i> Delete Profile</a></li>
                 <li><a href="./add_recipe.html"><i class="fas fa-plus-circle"></i> Add Recipe</a></li>
-                <li><a href="../../backend/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li><a href="#" onclick="Logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </aside> 
         <main class="main-content">
@@ -64,7 +64,53 @@
                     console.error('Error fetching profile data:', error);
                 });
         }
-        document.addEventListener('DOMContentLoaded', loadProfileData);
+
+        // logout
+        function Logout() {
+            fetch('../../backend/logout.php', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = './login.html?logout=1';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                window.location.href = './login.html';
+            });
+            
+            return false;
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('../../backend/get_user_profile.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'error') {
+                        window.location.href = './login.html';
+                        return;
+                    }
+
+                    // admin portal visibility
+                    const adminPortalLink = document.querySelector('a[href="./admin_view.html"]');
+                    if (adminPortalLink && data.user_type !== 'admin') {
+                        adminPortalLink.style.display = 'none';
+                    }
+
+                    loadProfileData();
+                    loadUserRecipes();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    window.location.href = './login.html';
+                });
+        });
         
         //delete user profile
         document.addEventListener('DOMContentLoaded', function() {
@@ -206,10 +252,6 @@
                 })
                 .catch(error => console.error('Error:', error));
         }
-        document.addEventListener('DOMContentLoaded', function() {
-            loadProfileData();
-            loadUserRecipes();
-        });
     </script>
 </body>
 </html>

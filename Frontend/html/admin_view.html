@@ -57,5 +57,21 @@
             </section>
         </main>
     </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // if user is admin
+        fetch('../../backend/authMiddleware.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.user_type !== 'admin') {
+                    window.location.href = './profile.html';// this has to chanege for now lets redirect to profile
+                }
+            })
+            .catch(error => {
+                console.error('Error checking authorization:', error);
+                window.location.href = './login.html';
+            });
+    });
+    </script>
 </body>
 </html>

@@ -3,13 +3,13 @@ session_start();
 
 session_unset();
 session_destroy();
-
-// Add error handling
-if (!headers_sent()) {
-    header('Location: ../Frontend/html/login.html?logout=1');
-    exit;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: application/json');
+    echo json_encode([
+        'status' => 'success',
+        'message' => 'Logged out successfully'
+    ]);
 } else {
-    echo '<script>window.location.href="../Frontend/html/login.html?logout=1";</script>';
-    exit;
+    header('Location: ../Frontend/html/login.html?logout=1');
 }
-?>
+exit;
