@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MystryMenu</title>
-  <link rel="stylesheet" href="../css/recipe_view.css?v=3.0">
+  <link rel="stylesheet" href="../css/recipe_view.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="../css/toast.css">
   <script src="../utility/SearchRecipes.js"></script>
@@ -53,7 +53,10 @@
                         <div id="recipe-method" class="method-description"></div>
                     </div>
                     <div class="actions">
-                        <button class="heart-btn"><i class="fas fa-heart"></i></button>
+                        <button class="heart-btn">
+                            <i class="fas fa-heart"></i>
+                            <span class="heart-count">0</span>
+                        </button>
                         <script>
                             document.querySelector('.heart-btn').addEventListener('click', function () {
                               this.classList.toggle('clicked');
@@ -330,6 +333,66 @@
         shareRecipe(recipeId);
         return false;
     };
+
+    function Heart() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('id');
+        const heartBtn = document.querySelector('.heart-btn');
+        const isCurrentlyHearted = heartBtn.classList.contains('clicked');
+
+        heartBtn.classList.toggle('clicked');
+        
+        // Update count
+        const currentCount = parseInt(document.querySelector('.heart-count').textContent);
+        document.querySelector('.heart-count').textContent = isCurrentlyHearted ? currentCount - 1 : currentCount + 1;
+        
+        fetch('../../backend/getRecipeDetails.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                recipe_id: recipeId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.querySelector('.heart-count').textContent = data.hearts;
+            } else if (data.message === 'not_logged_in') {
+                heartBtn.classList.toggle('clicked');
+                window.location.href = 'signup.html';
+            }
+        })
+        .catch(error => {
+            heartBtn.classList.toggle('clicked');
+            document.querySelector('.heart-count').textContent = currentCount;
+            console.error('Error:', error);
+        });
+    }
+    document.querySelector('.heart-btn').addEventListener('click', function () {
+        this.classList.toggle('clicked');
+        Heart();
+    });
+
+    // Initial load
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('id');
+        
+        fetch(`../../backend/getRecipeDetails.php?id=${recipeId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const heartBtn = document.querySelector('.heart-btn');
+                    if (data.hasHearted) {
+                        heartBtn.classList.add('clicked');
+                    }
+                    document.querySelector('.heart-count').textContent = data.hearts;
+                }
+            });
+    });
+
     </script>
     <div id="toast" class="toast"></div>
 </body>
