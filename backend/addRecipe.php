@@ -1,22 +1,13 @@
 <?php
-session_start();
 require_once 'db.php';
+require_once 'authMiddleware.php';
+
+//permissioned user
+getUserProfile($_SESSION['user_id'], ['admin,user']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!isset($_SESSION['user_id'])) {
-        $response = [
-            'success' => false,
-            'message' => 'User not logged in',
-        ];
-        echo json_encode($response);
-        exit;
-    }
-
-    $response = [
-        'success' => false,
-        'message' => '',
-    ];
-
+    header('Content-Type: application/json');
+    
     // Retrieve form data
     $recipeName = $_POST['recipe-name'] ?? '';
     $type = $_POST['type'] ?? '';
@@ -25,8 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $userId = $_SESSION['user_id'];
 
     if (empty($recipeName) || empty($type) || empty($ingredient) || empty($method)) {
-        $response['message'] = 'All fields are required.';
-        echo json_encode($response);
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => 'All fields are required.'
+        ]);
         exit;
     }
 
@@ -39,14 +33,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $maxFileSize = 10 * 1024 * 1024;
 
         if (!in_array($file['type'], $allowedTypes)) {
-            $response['message'] = 'Invalid file type. Only JPG, PNG, and GIF are allowed.';
-            echo json_encode($response);
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Invalid file type. Only JPG, PNG, and GIF are allowed.'
+            ]);
             exit;
         }
 
         if ($file['size'] > $maxFileSize) {
-            $response['message'] = 'File size exceeds the 10MB limit.';
-            echo json_encode($response);
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'message' => 'File size exceeds the 10MB limit.'
+            ]);
             exit;
         }
         if (!is_dir($uploadDir)) {
@@ -60,15 +60,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Move the uploaded file
         if (!move_uploaded_file($file['tmp_name'], $filePath)) {
-            $response['message'] = 'Failed to upload image.';
-            echo json_encode($response);
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Failed to upload image.'
+            ]);
             exit;
         }
 
         $imagePath = '/recipe_image/' . $newFileName;
     }
 
-    // Insert data into the database
     try {
         $sql = "INSERT INTO recipe (name, type, ingredient, method, image, user_id) 
                 VALUES (:name, :type, :ingredient, :method, :image, :user_id)";
@@ -82,12 +84,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':user_id' => $userId
         ]);
 
-        $response['success'] = true;
-        $response['message'] = 'Recipe added successfully!';
+        echo json_encode([
+            'success' => true,
+            'message' => 'Recipe added successfully!'
+        ]);
     } catch (PDOException $e) {
-        $response['message'] = 'Database error: ' . $e->getMessage();
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Database error: ' . $e->getMessage()
+        ]);
     }
-
-    echo json_encode($response);
 }
 ?>

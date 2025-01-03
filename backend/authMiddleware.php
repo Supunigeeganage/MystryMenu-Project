@@ -1,34 +1,58 @@
 <?php
 session_start();
-require 'db.php';
+
+// Add protected pages configuration
+$protectedPages = [
+    'dashboard.html' => ['admin', 'user'],
+    'profile.html' => ['admin', 'user'],
+    'add_recipe.html' => ['admin','user'],
+    'edit_recipe.html' => ['admin', 'user'],
+    'edit_profile.html'=> ['admin','user'],
+    'edit_recipe.html'=>['admin','user'],
+    'save_recipe.html'=>['admin','user'],
+    'share_recipe.html'=>['admin','user'],
+    'admin_view.html' => ['admin'],
+    'admin_view2.html' => ['admin'],
+    'admin_view3.html' => ['admin']
+];
 
 function getUserProfile($userId, $allowedUserTypes = []) {
     global $pdo;
     
-    $stmt = $pdo->prepare("SELECT firstName, lastName, gender, profession, email, profilePicture, user_type FROM Users WHERE id = ?");
-    $stmt->execute([$userId]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Check if user is logged in
+    if (!isset($_SESSION['user_id'])) {
+        header('Content-Type: application/json');
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Not logged in']);
+        exit;
+    }
+
+    // Check user type
+    if (!empty($allowedUserTypes) && !in_array($_SESSION['user_type'], $allowedUserTypes)) {
+        header('Content-Type: application/json');
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'you do not have access for this feature']);
+        exit;
+    }
     
-    if (!$user || (!empty($allowedUserTypes) && !in_array($user['user_type'], $allowedUserTypes))) {
-        return null;
+    try {
+        $stmt = $pdo->prepare("SELECT firstName, lastName, gender, profession, email, profilePicture, user_type FROM Users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$user) {
+            header('Content-Type: application/json');
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'User not found']);
+            exit;
+        }
+        
+        return $user;
+    } catch (PDOException $e) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Database error']);
+        exit;
     }
-    return $user;
-}
-
-if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['status' => 'error', 'message' => 'not_logged_in']);
-    exit;
-}
-
-try {
-    $user = getUserProfile($_SESSION['user_id'], ['admin', 'user']);
-    if ($user) {
-        echo json_encode(['status' => 'success', 'data' => $user]);
-    } else {
-        echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
-    }
-} catch (PDOException $e) {
-    error_log($e->getMessage());
-    echo json_encode(['status' => 'error', 'message' => 'Server error.']);
 }
 ?> 

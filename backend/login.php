@@ -38,7 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode([
             'status' => 'success',
             'message' => 'Login successful',
-            'user_type' => $user['user_type']
+            'user_type' => $user['user_type'],
+            'user_id' => $user['id']
         ]);
         exit;
 

@@ -18,7 +18,7 @@
                 <h2>Login</h2>
                 <br><br><br><br><br>
             </div>
-            <form id="loginForm" onsubmit="return Login(event)">
+            <form id="loginForm" onsubmit="return handleLogin(event)">
                 <input type="email" name="email" placeholder="E mail" required>
                 <input type="password" name="password" placeholder="Password" required>
                 <button type="submit" class="login-btn">Login</button>
@@ -29,7 +29,7 @@
     </div>
     <div id="toast" class="toast"></div>
     <script>
-        function Login(event) {
+        function handleLogin(event) {
             event.preventDefault();
             
             const formData = new FormData(event.target);
@@ -45,16 +45,20 @@
                 },
                 body: JSON.stringify(loginData)
             })
-            .then(response => {
-                if (response.ok) {
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Store both userType and userId
+                    sessionStorage.setItem('userType', data.user_type);
+                    sessionStorage.setItem('userId', data.user_id);
                     window.location.href = './dashboard.html';
                 } else {
-                    showToast('Invalid email or password', 'error');
+                    showToast(data.message || 'Login failed', 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showToast('An error occurred', 'error');
+                showToast('Login failed', 'error');
             });
 
             return false;
@@ -77,5 +81,10 @@
         if (urlParams.has('logout')) {
             showToast('Successfully logged out', 'success');
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Clear any existing session data
+            sessionStorage.clear();
+        });
     </script>    
 </html>
