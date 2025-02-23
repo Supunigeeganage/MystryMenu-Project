@@ -1,7 +1,13 @@
 <?php
 session_start();
 
-// Add protected pages configuration
+// Check if user is logged in and is an admin
+if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin') {
+    echo json_encode(['user_type' => $_SESSION['user_type']]);
+} else {
+    http_response_code(401);
+    echo json_encode(['error' => 'Not authorized']);
+}
 $protectedPages = [
     'dashboard.html' => ['admin', 'user'],
     'profile.html' => ['admin', 'user'],

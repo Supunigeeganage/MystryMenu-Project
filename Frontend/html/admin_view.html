@@ -61,7 +61,9 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         // if user is admin
-        fetch('../../backend/authMiddleware.php')
+        fetch('../../backend/authMiddleware.php', {
+            credentials: 'include'
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.user_type !== 'admin') {

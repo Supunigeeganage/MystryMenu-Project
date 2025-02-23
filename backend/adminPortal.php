@@ -1,4 +1,5 @@
 <?php
-require 'auth_middleware.php';
+session_start();
+require 'authMiddleware.php';
 checkUserType(['admin']);
 ?>
