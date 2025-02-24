@@ -17,9 +17,9 @@ $protectedPages = [
     'edit_recipe.html'=>['admin','user'],
     'save_recipe.html'=>['admin','user'],
     'share_recipe.html'=>['admin','user'],
-    'admin_view.html' => ['admin'],
-    'admin_view2.html' => ['admin'],
-    'admin_view3.html' => ['admin']
+    'recipeManagment.html' => ['admin'],
+    'userManagement.html' => ['admin'],
+    'poisonousRecipes.html' => ['admin']
 ];
 
 function getUserProfile($userId, $allowedUserTypes = []) {

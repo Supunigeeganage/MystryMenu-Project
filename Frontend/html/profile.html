@@ -18,7 +18,7 @@
             </div>
             <ul class="menu">
                 <li><a href="./dashboard.html"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="./admin_view.html"><i class="fas fa-user-shield"></i> Admin Portal</a></li>
+                <li><a href="./recipeManagment.html"><i class="fas fa-user-shield"></i> Admin Portal</a></li>
                 <li><a href="./edit_profile.html"><i class="fas fa-edit"></i> Edit</a></li>
                 <li><a href="" class="delete-profile"><i class="fas fa-trash-alt"></i> Delete Profile</a></li>
                 <li><a href="./add_recipe.html"><i class="fas fa-plus-circle"></i> Add Recipe</a></li>
@@ -99,7 +99,7 @@
                     }
 
                     // admin portal visibility
-                    const adminPortalLink = document.querySelector('a[href="./admin_view.html"]');
+                    const adminPortalLink = document.querySelector('a[href="./recipeManagment.html"]');
                     if (adminPortalLink && data.user_type !== 'admin') {
                         adminPortalLink.style.display = 'none';
                     }

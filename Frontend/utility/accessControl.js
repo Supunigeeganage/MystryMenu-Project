@@ -6,9 +6,9 @@ const protectedPages = {
     'edit_profile.html': ['admin', 'user'],
     'save_recipe.html': ['admin', 'user'],
     'share_recipe.html': ['admin', 'user'],
-    'admin_view.html': ['admin'],
-    'admin_view2.html': ['admin'],
-    'admin_view3.html': ['admin']
+    'recipeManagement.html': ['admin'],
+    'userManagement.html': ['admin'],
+    'poisonousRecipes.html': ['admin']
 };
 
 // Check user has the access and if not redirect to unauthorized page
