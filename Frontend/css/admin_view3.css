@@ -177,9 +177,11 @@ header {
 .view-btn:hover{
     background-color: rgb(113, 98, 243);
 }
-.admin p{
-    margin-left: 950px;
-    
+.admin p {
+    margin-left: 935px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    font-weight: bold;
 }
 .menu {
     list-style: none;
@@ -229,5 +231,13 @@ header {
 
 .menu a.active i {
     color: #007bff; /* Match the icon color to the text */
+}
+
+.header-icons img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
 }
 
