@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile</title>
-    <link rel="stylesheet" href="../css/edit_profile.css?v=1.0">
-    <link rel="stylesheet" href="../css/toast.css?v=1.0">
+    <link rel="stylesheet" href="../css/edit_profile.css?v=1.1">
+    <link rel="stylesheet" href="../css/toast.css?v=1.1">
     <script src="../utility/accessControl.js"></script>
 </head>
 <body>
@@ -18,7 +18,6 @@
                 <div class="heading">            
                     <img src="../image/editproicon.png" alt="Icon" class="icon">
                     <h2>Edit Profile</h2>
-                    <button type="button" id="edit-toggle-btn" aria-label="Toggle Edit Mode">Edit</button>
                 </div>
                 <div class="profile-pic">
                     <img id="preview" src="../image/usericon.png" alt="Profile Picture">
@@ -28,20 +27,26 @@
             </div>
             <form id="edit-profile-form" novalidate>
                 <div class="form-group">
-                    <input type="text" id="firstName" placeholder="First Name" disabled>
-                    <input type="text" id="lastName" placeholder="Last Name" disabled>
-                    <input type="text" id="gender" placeholder="Gender" disabled readonly>
-                    <select id="profession" disabled>
+                    <input type="text" id="firstName" placeholder="First Name" 
+                           readonly onclick="this.readOnly=false">
+                    <input type="text" id="lastName" placeholder="Last Name" 
+                           readonly onclick="this.readOnly=false">
+                    <input type="text" id="gender" placeholder="Gender" readonly>
+                    <select id="profession" 
+                            onclick="this.disabled=false">
                         <option value="" disabled selected>Change the Profession</option>
                         <option value="Chef">Chef</option>
                         <option value="Baker">Baker</option>
                         <option value="Cake Decorator">Cake Decorator</option>
                         <option value="Bartender">Bartender</option>
                     </select>
-                    <input type="email" id="email" placeholder="Email" disabled>
-                    <input type="password" id="currentPassword" placeholder="Current Password" disabled>
-                    <input type="password" id="newPassword" placeholder="New Password" disabled>
-                    <input type="password" id="confirmPassword" placeholder="Confirm New Password" disabled>
+                    <input type="email" id="email" placeholder="Email" readonly onclick="this.readOnly=false">
+                    <input type="password" id="currentPassword" placeholder="Current Password" 
+                           readonly onclick="this.readOnly=false">
+                    <input type="password" id="newPassword" placeholder="New Password" 
+                           readonly onclick="this.readOnly=false">
+                    <input type="password" id="confirmPassword" placeholder="Confirm New Password" 
+                           readonly onclick="this.readOnly=false">
                     <div class="button-group">
                         <button type="button" id="cancel-btn" class="cancel-btn">Cancel</button>
                         <button type="submit" class="edit-btn">Save</button>
@@ -55,19 +60,8 @@
 
     <script>
         const form = document.getElementById('edit-profile-form');
-        const editToggleBtn = document.getElementById('edit-toggle-btn');
         const cancelBtn = document.getElementById('cancel-btn');
         const toast = document.getElementById('toast');
-        let isEditable = false;
-
-        function toggleEditState() {
-            isEditable = !isEditable;
-            const inputs = form.querySelectorAll('input, select');
-            inputs.forEach(input => {
-                input.disabled = !isEditable;
-            });
-            editToggleBtn.textContent = isEditable ? 'View' : 'Edit';
-        }
 
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
@@ -81,13 +75,11 @@
 
         function saveProfile(event) {
             event.preventDefault();
-            if (!isEditable) return;
 
             const currentPassword = document.getElementById('currentPassword').value;
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
 
-            //profile data object
             const profileData = {
                 firstName: document.getElementById('firstName').value,
                 lastName: document.getElementById('lastName').value,
@@ -116,16 +108,10 @@
                 },
                 body: JSON.stringify(profileData),
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
                     showToast(data.message, 'success');
-                    toggleEditState();
                     // Clear password fields
                     document.getElementById('currentPassword').value = '';
                     document.getElementById('newPassword').value = '';
@@ -152,6 +138,12 @@
                         document.getElementById('profession').value = data.profession || '';
                         document.getElementById('email').value = data.email || '';
                         
+                        if (data.user_type === 'admin') {
+                            const professionSelect = document.getElementById('profession');
+                            professionSelect.disabled = true;
+                            professionSelect.removeAttribute('onclick');
+                        }
+                        
                         if (data.profilePicture) {
                             document.getElementById('preview').src = '../../backend' + data.profilePicture;
                         } else {
@@ -164,13 +156,11 @@
                 });
         }
 
-        editToggleBtn.addEventListener('click', toggleEditState);
         cancelBtn.addEventListener('click', () => {
-            toggleEditState();
             loadProfileData();
-
-            window.location.href = 'profile.html'; 
+            window.location.href = 'profile.html';
         });
+
         form.addEventListener('submit', saveProfile);
 
         document.addEventListener('DOMContentLoaded', loadProfileData);

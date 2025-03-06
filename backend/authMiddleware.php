@@ -1,13 +1,5 @@
 <?php
 session_start();
-
-// Check if user is logged in and is an admin
-if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin') {
-    echo json_encode(['user_type' => $_SESSION['user_type']]);
-} else {
-    http_response_code(401);
-    echo json_encode(['error' => 'Not authorized']);
-}
 $protectedPages = [
     'dashboard.html' => ['admin', 'user'],
     'profile.html' => ['admin', 'user'],
@@ -21,6 +13,29 @@ $protectedPages = [
     'userManagement.html' => ['admin'],
     'poisonousRecipes.html' => ['admin']
 ];
+
+// check user type
+function checkUserType($allowedTypes = []) {
+    if (!isset($_SESSION['user_type']) || empty($allowedTypes) || !in_array($_SESSION['user_type'], $allowedTypes)) {
+        header('Content-Type: application/json');
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+        exit;
+    }
+    return true;
+}
+
+// admin page checks with js and authmiddleware
+if (basename($_SERVER['PHP_SELF']) === 'authMiddleware.php') {
+    header('Content-Type: application/json');
+    if (isset($_SESSION['user_type'])) {
+        echo json_encode(['user_type' => $_SESSION['user_type']]);
+    } else {
+        http_response_code(401);
+        echo json_encode(['error' => 'Not authorized']);
+    }
+    exit;
+}
 
 function getUserProfile($userId, $allowedUserTypes = []) {
     global $pdo;

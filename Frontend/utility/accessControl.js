@@ -6,7 +6,7 @@ const protectedPages = {
     'edit_profile.html': ['admin', 'user'],
     'save_recipe.html': ['admin', 'user'],
     'share_recipe.html': ['admin', 'user'],
-    'recipeManagement.html': ['admin'],
+    'recipeManagment.html': ['admin'],
     'userManagement.html': ['admin'],
     'poisonousRecipes.html': ['admin']
 };
@@ -32,12 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const publicPages = ['login.html', 'main.html', 'signup.html', '', 'notAuthorized.html'];
     
-    // If not a public page, must be logged in
+    // If not a public page must be logged in
     if (!publicPages.includes(currentPage)) {
         const userType = sessionStorage.getItem('userType');
         const userId = sessionStorage.getItem('userId');
         
-        // Not logged in - redirect to login
+        // if Not logged in - redirect to login
         if (!userType || !userId) {
             console.log('No valid session - redirecting to login');
             sessionStorage.clear();

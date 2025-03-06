@@ -19,7 +19,7 @@
             <ul class="menu">
                 <li><a href="./dashboard.html"><i class="fas fa-home"></i> Home</a></li>
                 <li><a href="./recipeManagment.html"><i class="fas fa-user-shield"></i> Admin Portal</a></li>
-                <li><a href="./edit_profile.html"><i class="fas fa-edit"></i> Edit</a></li>
+                <li><a href="./edit_profile.html"><i class="fas fa-edit"></i> Edit Profile</a></li>
                 <li><a href="" class="delete-profile"><i class="fas fa-trash-alt"></i> Delete Profile</a></li>
                 <li><a href="./add_recipe.html"><i class="fas fa-plus-circle"></i> Add Recipe</a></li>
                 <li><a href="#" onclick="Logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
@@ -224,7 +224,22 @@
                 .then(data => {
                     if (data.status === 'success') {
                         showToast('Recipe deleted successfully', 'success');
-                        loadUserRecipes();
+                        fetch('../../backend/getUserRecipes.php')
+                            .then(response => response.json())
+                            .then(recipesData => {
+                                if (!recipesData.recipes || recipesData.recipes.length === 0) {
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 500);
+                                } else {
+                                    loadUserRecipes();
+                                }
+                            })
+                            .catch(() => {
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1000);
+                            });
                     } else {
                         showToast(data.message, 'error');
                     }

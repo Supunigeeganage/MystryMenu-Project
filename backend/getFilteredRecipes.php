@@ -22,14 +22,19 @@ try {
     
     $recipes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
+    // Always return success, even with empty recipes array
+    header('Content-Type: application/json');
     echo json_encode([
         'status' => 'success',
-        'recipes' => $recipes
+        'recipes' => $recipes,
+        'count' => count($recipes)
     ]);
 } catch (PDOException $e) {
+    header('Content-Type: application/json');
     echo json_encode([
         'status' => 'error',
-        'message' => 'Database error: ' . $e->getMessage()
+        'message' => 'Database error: ' . $e->getMessage(),
+        'recipes' => []
     ]);
 }
 ?> 

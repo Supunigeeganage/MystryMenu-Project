@@ -56,22 +56,5 @@
             </section>
         </main>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            fetch('../../backend/authMiddleware.php', {
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.user_type !== 'admin') {
-                    window.location.href = './profile.html'; // Redirect if not admin
-                }
-            })
-            .catch(error => {
-                console.error('Error checking authorization:', error);
-                window.location.href = './login.html'; // Redirect to login on error
-            });
-        });
-    </script>
 </body>
 </html>

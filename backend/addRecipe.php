@@ -3,7 +3,7 @@ require_once 'db.php';
 require_once 'authMiddleware.php';
 
 //permissioned user
-getUserProfile($_SESSION['user_id'], ['admin,user']);
+getUserProfile($_SESSION['user_id'], ['admin','user']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // image upload
-    $imagePath = '';
+    $imagePath = '/recipe_image/recipe image when no picture is upladed.jpg';
     if (isset($_FILES['recipe-image']) && $_FILES['recipe-image']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['recipe-image'];
         $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
