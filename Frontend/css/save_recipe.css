@@ -119,25 +119,30 @@ header {
 .recipe-container {
   display: flex;
   gap: 20px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 15px;
 }
 
 .recipe {
   flex: 0 0 auto;
   text-align: center;
   width: 350px; /* Adjust width as needed */
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 18px;
+  
   
 }
 
+
 .recipe img {
-  max-width: 100%;
+  max-width: 80%;
   border-radius: 10px;
+  padding-bottom: 10px;
 }
 
-.recipe p {
-  margin-top: 10px;
-  font-size: 1.2rem;
-  margin-right: 100px;
-}
+
 .save-recipe{
     margin-top: 70px;
     padding-left: 20px;
@@ -151,13 +156,7 @@ header {
     height: 35px;
     margin-top: 28px;
 }
-.recipe-container {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scroll-behavior: smooth;
 
-}
 /* Custom scrollbar styling */
 .recipe-container::-webkit-scrollbar {
     height: 8px; /* Height for horizontal scrollbar */
@@ -183,7 +182,7 @@ header {
 .delete-icon {
     font-size: 20px;
     color: #000000;
-    margin-right: 80px; /* Space between icon and recipe name */
+    margin-right: 20px; /* Space between icon and recipe name */
     cursor: pointer;
 }
 

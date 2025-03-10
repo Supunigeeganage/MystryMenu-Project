@@ -184,19 +184,9 @@ header {
 }
 
 .recipe p {
-    margin-top: 10px;
-    font-size: 16px;
+    font-family: 'Times New Roman', Times, serif;
     font-weight: bold;
 }
-.recipe p {
-    display: flex;
-    align-items: center;
-    font-size: 16px;
-    font-weight: bold;
-    margin-top: 10px;
-    margin-left: 120px;
-}
-
 .share-icon {
     font-size: 20px;
     color: #000000;
@@ -245,4 +235,3 @@ header {
     color: #000000;
     margin: 0;
 }
-  
