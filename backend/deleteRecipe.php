@@ -31,7 +31,7 @@ try {
     $recipeStmt->execute([$data['recipe_id']]);
     $recipe = $recipeStmt->fetch(PDO::FETCH_ASSOC);
     
-    // If recipe doesn't exist, return success since it's already gone
+    // If recipe doesn't exist, return a success msg
     if (!$recipe) {
         echo json_encode(['status' => 'success', 'message' => 'Recipe already deleted or does not exist']);
         exit;
