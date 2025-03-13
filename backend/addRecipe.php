@@ -2,8 +2,8 @@
 require_once 'db.php';
 require_once 'authMiddleware.php';
 
-//permissioned user
-getUserProfile($_SESSION['user_id'], ['admin','user']);
+// Check if user is admin or user
+checkUserType(['admin', 'user']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
@@ -14,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ingredient = $_POST['ingredient'] ?? '';
     $method = $_POST['method'] ?? '';
     $userId = $_SESSION['user_id'];
+    $isOverride = isset($_POST['override_warning']) && $_POST['override_warning'] === 'true';
 
     if (empty($recipeName) || empty($type) || empty($ingredient) || empty($method)) {
         http_response_code(400);
@@ -71,24 +72,109 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $imagePath = '/recipe_image/' . $newFileName;
     }
 
+    // Poisonous Ingredient Check
     try {
-        $sql = "INSERT INTO recipe (name, type, ingredient, method, image, user_id) 
-                VALUES (:name, :type, :ingredient, :method, :image, :user_id)";
+        $isPoisonous = false;
+        $poisonousIngredients = [];
+        
+        // Get all poisonous ingredients from database
+        $sql = "SELECT name FROM poisonous_ingredients";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            ':name' => $recipeName,
-            ':type' => $type,
-            ':ingredient' => $ingredient,
-            ':method' => $method,
-            ':image' => $imagePath,
-            ':user_id' => $userId
-        ]);
+        $stmt->execute();
+        $dbPoisonousIngredients = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        // temporarily replace commas inside parentheses with ### characters
+        $modifiedIngredient = preg_replace_callback('/\([^)]+\)/', function($matches) {
+            return str_replace(',', '###', $matches[0]);
+        }, $ingredient);
+
+        // split by commas and restore the original commas
+        $userIngredients = array_map(function($item) {
+            return str_replace('###', ',', trim($item));
+        }, explode(',', $modifiedIngredient));
+        
+        // to see how it happens logs
+        error_log("Original ingredient string: " . $ingredient);
+        error_log("Modified ingredient string: " . $modifiedIngredient);
+        error_log("Split ingredients: " . print_r($userIngredients, true));
+        
+        // Check each ingredient with the database list
+        foreach ($userIngredients as $userIngredient) {
+            $cleanUserIngredient = trim($userIngredient);
+            
+            foreach ($dbPoisonousIngredients as $dbIngredient) {
+                if (strcasecmp($cleanUserIngredient, trim($dbIngredient)) === 0) {
+                    $poisonousIngredients[] = $dbIngredient;
+                    error_log("Match found - User: '$cleanUserIngredient' DB: '$dbIngredient'");
+                    break;
+                }
+            }
+        }
+        
+        if (!empty($poisonousIngredients)) {
+            $isPoisonous = true;
+            // Only show warning if not overriding
+            if (!$isOverride) {
+                echo json_encode([
+                    'success' => false,
+                    'warning' => true,
+                    'poisonous' => true,
+                    'ingredients' => $poisonousIngredients,
+                    'message' => 'The following ingredients are potentially poisonous: ' . implode(', ', $poisonousIngredients)
+                ]);
+                exit;
+            }
+        }
+
+        // If we get here, either there are no poisonous ingredients or we're overriding
+        if ($isPoisonous) {
+            $sql = "INSERT INTO poisonous_recipes (name, type, ingredient, method, image, user_id, poisonous, status) 
+                    VALUES (:name, :type, :ingredient, :method, :image, :user_id, :poisonous, :status)";
+            $message = 'Recipe submitted for admin review';
+            
+            $params = [
+                ':name' => $recipeName,
+                ':type' => $type,
+                ':ingredient' => $ingredient,
+                ':method' => $method,
+                ':image' => $imagePath,
+                ':user_id' => $userId,
+                ':poisonous' => 'yes',
+                ':status' => 'pending'
+            ];
+        } else {
+            $sql = "INSERT INTO recipe (name, type, ingredient, method, image, user_id, poisonous) 
+                    VALUES (:name, :type, :ingredient, :method, :image, :user_id, :poisonous)";
+            $message = 'Recipe added successfully!';
+            
+            $params = [
+                ':name' => $recipeName,
+                ':type' => $type,
+                ':ingredient' => $ingredient,
+                ':method' => $method,
+                ':image' => $imagePath,
+                ':user_id' => $userId,
+                ':poisonous' => 'no'
+            ];
+        }
+        
+        $stmt = $pdo->prepare($sql);
+        $result = $stmt->execute($params);
+
+        if (!$result) {
+            error_log('Failed to insert recipe. SQL: ' . $sql);
+            error_log('PDO Error Info: ' . print_r($stmt->errorInfo(), true));
+            throw new PDOException('Failed to insert recipe: ' . $stmt->errorInfo()[2]);
+        }
 
         echo json_encode([
             'success' => true,
-            'message' => 'Recipe added successfully!'
+            'isAdmin' => $_SESSION['user_type'] === 'admin',
+            'isPoisonous' => $isPoisonous,
+            'message' => $message
         ]);
     } catch (PDOException $e) {
+        error_log('Database error in addRecipe.php: ' . $e->getMessage());
         http_response_code(500);
         echo json_encode([
             'success' => false,

@@ -253,3 +253,100 @@ header {
     cursor: pointer;
 }
 
+/* Recipe card styles */
+.recipe-card {
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    padding-left: 50px;
+    padding-right: 50px;
+    margin-bottom: 20px;
+    width: 90%;
+    align-items: center;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.recipe-card .recipe-header {
+    display: flex;
+    align-items: center;
+    width: 50%;
+}
+
+.recipe-card .recipe-header div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-right: 40px;
+}
+
+.recipe-card h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.recipe-card .recipe-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    margin-right: 30px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.recipe-card .action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    align-items: center;
+    width: 50%;
+}
+
+/* button style for all action buttons */
+.recipe-card .view-btn,
+.recipe-card .approve-btn,
+.recipe-card .delete-btn {
+    height: 40px;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 30px;
+    background-color: rgb(7, 7, 7);
+    color: #fff;
+    font-size: 16px;
+    margin-top: 0;
+    margin-right: 10px;
+}
+
+/* hover effects */
+.recipe-card .view-btn:hover {
+    background-color: rgb(113, 98, 243);
+}
+
+.recipe-card .approve-btn:hover {
+    background-color: #4caf50;
+}
+
+.recipe-card .delete-btn:hover {
+    background-color: red;
+}
+
+.recipe-status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.status-pending {
+    background-color: #ffd700;
+    color: #333;
+}
+
