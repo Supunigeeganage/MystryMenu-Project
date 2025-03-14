@@ -157,3 +157,67 @@ label[for="changereciInput"] {
 .add:hover {
     background-color: rgb(6, 95, 228) ;
 }
+
+/*poisonous warning popup */
+.warning-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.warning-content {
+    background-color: white;
+    border-left: 6px solid #cc0000;
+    padding: 25px;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.warning-content h3 {
+    color: #cc0000;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.warning-content p {
+    margin: 10px 0;
+}
+
+#poisonousIngredientsList {
+    font-weight: normal;
+    background-color: #fff4f4;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.warning-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.warning-buttons button {
+    background-color: #cc0000;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.warning-buttons button:hover {
+    background-color: #a40000;
+}
+
+.ingredient-highlight {
+    border-color: #cc0000 !important;
+}

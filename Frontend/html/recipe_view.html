@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MystryMenu</title>
-  <link rel="stylesheet" href="../css/recipe_view.css?v=1.0.1">
+  <link rel="stylesheet" href="../css/recipe_view.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="../css/toast.css">
   <script src="../utility/SearchRecipes.js"></script>
@@ -138,79 +138,28 @@
         loadRelatedRecipes();
         const urlParams = new URLSearchParams(window.location.search);
         const recipeId = urlParams.get('id');
-        const recipeType = urlParams.get('type');
 
         if (recipeId) {
-            let endpoint = '../../backend/getRecipeDetails.php?id=' + recipeId;
-            
-            // If a poisonous recipe use getPoisonousRecipes.php
-            if (recipeType === 'poisonous') {
-                endpoint = '../../backend/getPoisonousRecipes.php';
-            }
-
-            fetch(endpoint, {
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                let recipe;
-                
-                if (recipeType === 'poisonous') {
-                    if (!data.success) {
-                        throw new Error(data.message || 'Failed to load recipe');
-                    }
-                    // Find the specific poisonous recipe from the list
-                    recipe = data.recipes.find(r => r.poisonous_recipe_id === parseInt(recipeId));
-                } else {
-                    if (data.status !== 'success') {
-                        throw new Error(data.message || 'Failed to load recipe');
-                    }
-                    recipe = data.recipe;
-                }
-
-                if (recipe) {
-                    // Update recipe name
-                    document.querySelector('.recipe-name p').textContent = recipe.name;
-                    
-                    // Update recipe image
-                    const recipeImage = document.querySelector('.recipe-details img');
-                    recipeImage.src = recipe.image ? '../../backend' + recipe.image : '../image/recipe4.jpeg';
-                    recipeImage.onerror = () => recipeImage.src = '../image/recipe4.jpeg';
-                    
-                    // Update ingredients and method
-                    document.getElementById('recipe-ingredients').innerHTML = formatIngredients(recipe.ingredient);
-                    document.getElementById('recipe-method').innerHTML = formatMethod(recipe.method);
-
-                    // For poisonous recipes hide certain elements and show the back button
-                    if (recipeType === 'poisonous') {
-
-                        // Hide unnecessary elements for poisonous recipes
-                        document.querySelector('.actions').style.display = 'none';
-                        document.querySelector('.feedback').style.display = 'none';
-
-                        // back button container outside the recipe details
-                        const backButtonSection = document.createElement('div');
-                        backButtonSection.className = 'back-button-section';
+            fetch(`../../backend/getRecipeDetails.php?id=${recipeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const recipe = data.recipe;
                         
-                        const backButton = document.createElement('button');
-                        backButton.className = 'cancel-btn';
-                        backButton.textContent = 'Back to Poisonous Recipes';
-                        backButton.onclick = () => window.location.href = 'poisonousRecipes.html';
+                        document.querySelector('.recipe-name p').textContent = recipe.name;
                         
-                        backButtonSection.appendChild(backButton);
+                        const recipeImage = document.querySelector('.recipe-details img');
+                        recipeImage.src = recipe.image ? '../../backend' + recipe.image : '../image/recipe4.jpeg';
                         
-                        // Add the back button section after the recipe-details section
-                        const recipeDetailsSection = document.querySelector('.recipe-details');
-                        recipeDetailsSection.parentNode.insertBefore(backButtonSection, recipeDetailsSection.nextSibling);
+                        document.getElementById('recipe-ingredients').innerHTML = formatIngredients(recipe.ingredient);
+                        document.getElementById('recipe-method').innerHTML = formatMethod(recipe.method);
+                    } else {
+                        console.error('Error loading recipe:', data.message);
                     }
-                } else {
-                    showToast('Recipe not found', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast(error.message || 'Error loading recipe', 'error');
-            });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         }
     });
 

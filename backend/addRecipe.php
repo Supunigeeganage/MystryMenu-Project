@@ -1,12 +1,13 @@
 <?php
 require_once 'db.php';
 require_once 'authMiddleware.php';
-
-// Check if user is admin or user
 checkUserType(['admin', 'user']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
+    
+    // Check if only checking for poisonous ingredients (for edit_recipe.html)
+    $checkOnly = isset($_POST['check_only']) && $_POST['check_only'] === 'true';
     
     // Retrieve form data
     $recipeName = $_POST['recipe-name'] ?? '';
@@ -25,9 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // image upload
+    // If only checking for poisonous ingredients skip image upload
     $imagePath = '/recipe_image/recipe image when no picture is upladed.jpg';
-    if (isset($_FILES['recipe-image']) && $_FILES['recipe-image']['error'] === UPLOAD_ERR_OK) {
+    if (!$checkOnly && isset($_FILES['recipe-image']) && $_FILES['recipe-image']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['recipe-image'];
         $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
         $uploadDir = __DIR__ . '/recipe_image/';
@@ -126,7 +127,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // If we get here, either there are no poisonous ingredients or we're overriding
+        // If checking for poisonous ingredients exit here
+        if ($checkOnly) {
+            echo json_encode([
+                'success' => true,
+                'poisonous' => $isPoisonous,
+                'ingredients' => $poisonousIngredients,
+                'check_only' => true,
+                'message' => $isPoisonous ? 'Found poisonous ingredients' : 'No poisonous ingredients found'
+            ]);
+            exit;
+        }
+
+        // If get here either there are no poisonous ingredients or overriding
         if ($isPoisonous) {
             $sql = "INSERT INTO poisonous_recipes (name, type, ingredient, method, image, user_id, poisonous, status) 
                     VALUES (:name, :type, :ingredient, :method, :image, :user_id, :poisonous, :status)";
