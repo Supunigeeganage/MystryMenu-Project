@@ -99,10 +99,9 @@ header {
     overflow-y: auto; /* Makes only this section scrollable */
     display: grid;
     grid-template-columns: repeat(1, 1fr);
-    gap: 20px;
     padding: 10px;
     margin-bottom: 30px;
-    margin-left: 320px;
+    margin-left: 260px;
 }
 .recipes::-webkit-scrollbar {
     display: none; /* For Chrome, Safari, and Edge */
@@ -119,33 +118,24 @@ header {
 }
 
 .recipe p {
-    margin-top: 70px;
+    margin-top: 60px;
     font-size: 16px;
     font-weight: bold;
     margin-left: 30px;
-    margin-right: 30px;
+    margin-right: 60px;
+    max-width: 150px;
 }
 
 .user{
     font-size: 33px;
 }
-.header-icons i:hover {
+.header-icons img:hover {
     background-color: rgba(200, 200, 200, 0.5); /* Change to the desired color */
     border-radius: 50%; /* Optional: makes the background circular */
-    padding: 2px; /* Optional: add some padding around the icon */
-    transform: scale(1.2);
+    padding: 0.5px; /* Optional: add some padding around the icon */
+    transform: scale(1.1);
 }
-.header-icons i {
-    width: 40px; /* Set fixed width */
-    height: 40px; /* Set fixed height */
-    line-height: 40px; /* Align icon vertically */
-    text-align: center; /* Align icon horizontally */
-    display: inline-block; /* Ensure it behaves like a box */
-    border-radius: 50%; /* Make it circular */
-    transition: background-color 0.3s ease; /* Smooth hover effect */
-    position: relative;
-    
-}
+
 .delete-btn {
     height: 40px; /* Explicitly define the height */
     padding: 10px 20px; /* Adjust padding for horizontal space */
@@ -178,7 +168,7 @@ header {
     background-color: rgb(113, 98, 243);
 }
 .admin p {
-    margin-left: 935px;
+    margin-left: 945px;
     margin-top: 10px;
     margin-bottom: 20px;
     font-weight: bold;
@@ -239,5 +229,8 @@ header {
     border-radius: 50%;
     object-fit: cover;
     display: block;
+    text-align: center; /* Align icon horizontally */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+    position: relative;
 }
 

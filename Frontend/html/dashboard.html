@@ -4,10 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MystryMenu</title>
-    <link rel="stylesheet" href="../css/dashboard.css?v=2.9">
+    <link rel="stylesheet" href="../css/dashboard.css?v=2.2">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="../utility/SearchRecipes.js"></script>
     <script src="../utility/accessControl.js"></script>
+    <style>
+        .star {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: rgb(255, 255, 255);
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgb(2, 2, 2);
+            animation: spread 0.5s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes spread {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -192,6 +208,23 @@
                 searchRecipes(searchQuery, false, false);
             }
         });
+        //star line
+        document.addEventListener("mousemove", function(e) {
+            for (let i = 0; i < 5; i++) {
+                createStar(e.clientX, e.clientY);
+            }
+        });
+        
+        function createStar(x, y) {
+            let star = document.createElement("div");
+            star.classList.add("star");
+            let offsetX = (Math.random() - 0.5) * 20;
+            let offsetY = (Math.random() - 0.5) * 20;
+            star.style.left = `${x + offsetX}px`;
+            star.style.top = `${y + offsetY}px`;
+            document.body.appendChild(star);
+            setTimeout(() => { star.remove(); }, 500);
+        }
     </script>
 </body>
 </html>
