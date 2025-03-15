@@ -63,6 +63,11 @@ header {
     right: 40px; /* Position icons next to the login/signup buttons */
     display: flex;
     cursor: pointer; 
+    gap: 40px;
+    font-size: 30px;
+    color: #000;
+
+    
 }
 
 .search-bar {
@@ -91,75 +96,83 @@ header {
     cursor: pointer;
 }
 .recipes {
-    flex: 1; /* Takes up the remaining space */
-    overflow-y: auto; /* Makes only this section scrollable */
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
-    gap:30px;
-    padding: 10px;
-    margin-bottom: 30px;
-    margin-left:250px;
-}
-.recipes::-webkit-scrollbar {
-    display: none; /* For Chrome, Safari, and Edge */
-}
-
-.recipes {
-    scrollbar-width: none; /* For Firefox */
-    -ms-overflow-style: none; /* For Internet Explorer and Edge */
+    margin-left: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto; 
+    -ms-overflow-style: none; 
+    scrollbar-width: none;
 }
 
 .recipe {
-    text-align: center;
-    display: inline-flex;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 800px;
+    margin-bottom: 15px;
 }
 
 .recipe p {
-    margin-top:30px;
-    font-size: 16px;
+    margin: 0 !important;
+    margin-right: auto !important;
+    font-size: 18px;
     font-weight: bold;
-    margin-left: 30px;
-    margin-right: 30px;
-    max-width: 120px;
 }
-
-.header-icons img:hover {
-    background-color: rgba(200, 200, 200, 0.5); /* Change to the desired color */
-    border-radius: 50%; /* Optional: makes the background circular */
-    padding: 0.5px;/*ptional: add some padding around the icon */
-    transform: scale(1.1);
+.recipe img {
+    width: 80px !important;
+    height: 80px !important;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-right: 20px !important;
 }
-
-.delete-btn {
-    height: 40px; /* Explicitly define the height */
-    padding: 10px 20px; /* Adjust padding for horizontal space */
-    margin-left: 10px;
+.view-btn, .delete-btn {
+    margin-top: 0 !important;
+    height: 40px;
+    padding: 10px 20px;
     border: none;
     cursor: pointer;
     border-radius: 30px;
     background-color: rgb(7, 7, 7);
     color: #fff;
     font-size: 16px;
-    margin-top:20px;
+    margin-left: 10px;
 }
 .delete-btn:hover{
     background-color: red;
 }
 .view-btn {
-    height: 40px; /* Explicitly define the height */
-    padding: 10px 20px; /* Adjust padding for horizontal space */
-    margin-left: 10px;
-    border: none;
-    cursor: pointer;
-    border-radius: 30px;
-    background-color: rgb(7, 7, 7);
-    color: #fff;
-    font-size: 16px;
-    margin-right: 30px;
-    margin-top:20px;
+    margin-right: 10px !important;
+}
+
+
+.user{
+    font-size: 33px;
+
 }
 .view-btn:hover{
     background-color: rgb(113, 98, 243);
+}
+.header-icons i:hover {
+    background-color: rgba(200, 200, 200, 0.5); /* Change to the desired color */
+    border-radius: 50%; /* Optional: makes the background circular */
+    padding: 2px; /* Optional: add some padding around the icon */
+    transform: scale(1.2);
+}
+.header-icons i {
+    width: 40px; /* Set fixed width */
+    height: 40px; /* Set fixed height */
+    line-height: 40px; /* Align icon vertically */
+    text-align: center; /* Align icon horizontally */
+    display: inline-block; /* Ensure it behaves like a box */
+    border-radius: 50%; /* Make it circular */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+    position: relative;
+    
 }
 
 .admin p {
