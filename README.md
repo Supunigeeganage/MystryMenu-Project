@@ -11,23 +11,7 @@ effortlessly.
 
 
 
-Project Objectives
-
-Develop an intuitive and user-friendly interface for recipe management.
-
-Allow users to organize and personalize their recipe collections.
-
-Enable sharing and discovery of recipes within a food-loving community.
-
-Maintain data security and protect users' private information.
-
-Provide guided recipes for beginners to enhance their cooking skills.
-
-
-
-
-
-User Roles & Features
+**User Roles & Features**
 
 1. Admin
 
@@ -66,7 +50,7 @@ View community-shared recipes.
 
 
 
-Installation & Setup
+**Installation & Setup**
 
 Prerequisites
 
@@ -79,23 +63,38 @@ Code Editor(Visual Code, Notepad)
 PHP, HTML, CSS, Java Script(AJAX)
 
 
-**Steps to Install**
+**Steps to run the application**
 
-Clone the repository
-
+Clone the repository to your htdocs or www folder
 git clone https://github.com/yourusername/MystryMenu-Project.git
 
-Install dependencies 
+Install dependencies
+ 1.Install composer
 
 Set up the database
 
-Run the application   
+1. Start *Apache* and *MySQL* in XAMPP/WAMP.
+2. Open PHPMyAdmin (at http://localhost/phpmyadmin).
+3. Create a new database (mystrymenu)
+4. Import the database structure(Choose the database_dump.sql file from the project directory)
+5. Open the db.php file in the project.   
+6. Ensure that the connection parameters are correct
 
-Access the application at http://localhost:8000
+    $host = 'localhost';
+    $dbname = 'mystrymenu';    // The database you created above
+    $username = 'root';    
+    $password = '';       
+    
+Save the file.
+
+Run the Project
+
+1. Open the project folder in your browser (http://localhost/your-project-folder).
 
 
 
-Contributors
+
+**Contributors**
 
 Project Team- [Group 28.4]
 
