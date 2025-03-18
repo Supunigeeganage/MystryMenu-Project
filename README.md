@@ -9,6 +9,8 @@ enhance the cooking experience for beginners, chefs, and food enthusiasts. The s
 dietary preferences, and cooking techniques. It fosters a culinary community where users can explore, share, and organize their favorite recipes 
 effortlessly.
 
+
+
 Project Objectives
 
 Develop an intuitive and user-friendly interface for recipe management.
@@ -62,30 +64,6 @@ Browse available recipes.
 View community-shared recipes.
 
 
-Project Progress
-
-Initial project discussions and problem identification.
-
-Selection of MystryMenu as the project name.
-
-Requirements gathering and classification into functional and non-functional aspects.
-
-Design of the Use Case Diagram and wireframes.
-
-Refinement and updates to system design based on feedback.
-
-Development of Software Requirements Specification (SRS) document.
-
-Submission of project progress reports for approval.
-
-Implementation of system architecture and database.
-
-Development of front-end and back-end features.
-
-Testing and debugging for optimization.
-
-Finalization and deployment of the application.
-
 
 
 Installation & Setup
@@ -98,27 +76,23 @@ Database server (MySQL)
  
 Code Editor(Visual Code, Notepad)
 
+PHP, HTML, CSS, Java Script(AJAX)
 
-Steps to Install
+
+**Steps to Install**
 
 Clone the repository
 
 git clone https://github.com/yourusername/MystryMenu-Project.git
 
-Install dependencies
+Install dependencies 
 
 Set up the database
 
-Run the application
+Run the application   
 
 Access the application at http://localhost:8000
 
-
-Conclusion
-
-MystryMenu is an online recipe management system designed to enhance the 
-cooking experience by providing an interactive, secure, and user-friendly platform for culinary enthusiasts.
-It fosters a strong community of food lovers, allowing users to explore, share, and manage their favorite recipes effortlessly. 
 
 
 Contributors
