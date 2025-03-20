@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Recipe</title>
+    <link rel="stylesheet" href="../css/share_recipe.css?v=1.0">
+    <script src="../utility/accessControl.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-section">
+            <img src="../image/sidelogo.png" alt="MystryMenu Logo" class="logo">
+        </div>
+        <div class="form-section">
+            <div class="heading">            
+                <img src="../image/sharerep.png" alt="Icon" class="icon">
+                <h2>Share Recipe</h2>
+            </div>
+            <div class="recipe">
+                <img id="recipe-image" src="../image/recipe5.jpeg" alt="Recipe" class="recipe-img">
+                <p id="recipe-name">Recipe Name</p>
+            </div>
+            <div class="share-icons">
+                <button class="icon facebook" onclick="shareToFacebook()"></button>
+                <button class="icon messenger" onclick="shareToMessenger()"></button>
+                <button class="icon instagram" onclick="shareToInstagram()"></button>
+                <button class="icon whatsapp" onclick="shareToWhatsApp()"></button>
+                <button class="icon x-platform" onclick="shareToX()"></button>
+            </div>
+            <button class="cancel-btn">Cancel</button>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const storedRecipe = localStorage.getItem('sharedRecipe');
+            if (storedRecipe) {
+                const recipe = JSON.parse(storedRecipe);
+                document.getElementById('recipe-image').src = recipe.image 
+                    ? '../../' + recipe.image 
+                    : '../image/recipe5.jpeg';
+                document.getElementById('recipe-name').textContent = recipe.name;
+                localStorage.removeItem('sharedRecipe');
+            } else {
+                const urlParams = new URLSearchParams(window.location.search);
+                const recipeId = urlParams.get('id');
+                if (recipeId) {
+                    fetch(`../../getRecipeDetails.php?id=${recipeId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                const recipe = data.recipe;
+                                document.getElementById('recipe-image').src = recipe.image 
+                                    ? '../../' + recipe.image 
+                                    : '../image/recipe5.jpeg';
+                                document.getElementById('recipe-name').textContent = recipe.name;
+                            }
+                        })
+                        .catch(error => console.error('Error loading recipe:', error));
+                }
+            }
+
+            document.querySelector('.cancel-btn').addEventListener('click', function() {
+                window.history.back();
+            });
+        });
+
+        function shareToFacebook() {
+            const recipeUrl = encodeURIComponent(window.location.href);
+            const recipeName = encodeURIComponent(document.getElementById('recipe-name').textContent);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${recipeUrl}&quote=${recipeName}`, '_blank');
+        }
+
+        function shareToWhatsApp() {
+            const recipeUrl = encodeURIComponent(window.location.href);
+            const recipeName = encodeURIComponent(document.getElementById('recipe-name').textContent);
+            window.open(`https://api.whatsapp.com/send?text=${recipeName}%20-%20${recipeUrl}`, '_blank');
+        }
+
+        function shareToX() {
+            const recipeUrl = encodeURIComponent(window.location.href);
+            const recipeName = encodeURIComponent(document.getElementById('recipe-name').textContent);
+            window.open(`https://twitter.com/intent/tweet?text=${recipeName}&url=${recipeUrl}`, '_blank');
+        }
+
+        function shareToMessenger() {
+            const recipeUrl = encodeURIComponent(window.location.href);
+            window.open(`https://www.facebook.com/dialog/send?link=${recipeUrl}&app_id=YOUR_FACEBOOK_APP_ID`, '_blank');
+        }
+
+        function shareToInstagram() {
+            //alert('To share on Instagram be patient');
+            window.open(`https://www.instagram.com/accounts/login/?hl=en`);
+        }
+    </script>
+</body>
+</html>

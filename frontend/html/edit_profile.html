@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="../css/edit_profile.css?v=1.3">
+    <link rel="stylesheet" href="../css/toast.css?v=1.1">
+    <script src="../utility/accessControl.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <img src="../image/logo.jpg" alt="MystryMenu Logo" class="logo">
+        </div>
+        <div class="content">
+            <div class="profile-header">
+                <div class="heading">            
+                    <img src="../image/editproicon.png" alt="Icon" class="icon">
+                    <h2>Edit Profile</h2>
+                </div>
+                <div class="profile-pic">
+                    <img id="preview" src="../image/usericon.png" alt="Profile Picture">
+                    <input type="file" id="profilePicInput" accept="image/*">
+                    <label for="profilePicInput">Change your profile picture</label>
+                </div>                
+            </div>
+            <form id="edit-profile-form" novalidate>
+                <div class="form-group">
+                    <input type="text" id="firstName" placeholder="First Name" 
+                           readonly onclick="this.readOnly=false">
+                    <input type="text" id="lastName" placeholder="Last Name" 
+                           readonly onclick="this.readOnly=false">
+                    <input type="text" id="gender" placeholder="Gender" readonly>
+                    <select id="profession" 
+                            onclick="this.disabled=false">
+                        <option value="" disabled selected>Change the Profession</option>
+                        <option value="Chef">Chef</option>
+                        <option value="Baker">Baker</option>
+                        <option value="Cake Decorator">Cake Decorator</option>
+                        <option value="Bartender">Bartender</option>
+                    </select>
+                    <input type="email" id="email" placeholder="Email" readonly onclick="this.readOnly=false">
+                    <input type="password" id="currentPassword" placeholder="Current Password" 
+                           readonly onclick="this.readOnly=false">
+                    <input type="password" id="newPassword" placeholder="New Password" 
+                           readonly onclick="this.readOnly=false">
+                    <input type="password" id="confirmPassword" placeholder="Confirm New Password" 
+                           readonly onclick="this.readOnly=false">
+                    <div class="button-group">
+                        <button type="button" id="cancel-btn" class="cancel-btn">Cancel</button>
+                        <button type="submit" class="edit-btn">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const form = document.getElementById('edit-profile-form');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const toast = document.getElementById('toast');
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        function isAdminViewingUser() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.has('view_user_id');
+        }
+
+        function saveProfile(event) {
+            event.preventDefault();
+
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            const profileData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                gender: document.getElementById('gender').value,
+                profession: document.getElementById('profession').value,
+                email: document.getElementById('email').value,
+            };
+
+            if (currentPassword || newPassword || confirmPassword) {
+                if (newPassword !== confirmPassword) {
+                    showToast('New password and confirm password do not match.', 'error');
+                    return;
+                }
+                profileData.action = 'changePassword';
+                profileData.currentPassword = currentPassword;
+                profileData.newPassword = newPassword;
+                profileData.confirmPassword = confirmPassword;
+            } else {
+                profileData.action = 'updateProfile';
+            }
+
+            fetch('../../update_user_profile.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(profileData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showToast(data.message, 'success');
+                    // Clear password fields
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                    loadProfileData();
+                } else {
+                    showToast(data.message || 'Update failed', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Failed to update profile. Please try again.', 'error');
+            });
+        }
+
+        function loadProfileData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const viewUserId = urlParams.get('view_user_id');
+            const url = viewUserId ? 
+                `../../get_user_profile.php?user_id=${viewUserId}` :
+                '../../get_user_profile.php';
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        document.getElementById('firstName').value = data.firstName || '';
+                        document.getElementById('lastName').value = data.lastName || '';
+                        document.getElementById('gender').value = data.gender || '';
+                        document.getElementById('profession').value = data.profession || '';
+                        document.getElementById('email').value = data.email || '';
+                        
+                        if (isAdminViewingUser()) {
+                            document.getElementById('currentPassword').style.display = 'none';
+                            document.getElementById('newPassword').style.display = 'none';
+                            document.getElementById('confirmPassword').style.display = 'none';
+                            document.querySelector('label[for="profilePicInput"]').style.display = 'none';
+                            document.getElementById('profilePicInput').style.display = 'none';
+                            
+                            document.getElementById('firstName').readOnly = true;
+                            document.getElementById('lastName').readOnly = true;
+                            document.getElementById('profession').disabled = true;
+                            document.getElementById('email').readOnly = true;
+                            
+                            document.querySelector('.cancel-btn').textContent = 'Back to Users';
+                            document.querySelector('.edit-btn').style.display = 'none';
+                            
+                            document.querySelector('.heading h2').textContent = 'View User Profile';
+                        } else if (data.user_type === 'admin') {
+                            const professionSelect = document.getElementById('profession');
+                            professionSelect.disabled = true;
+                            professionSelect.removeAttribute('onclick');
+                        }
+                        
+                        if (data.profilePicture) {
+                            document.getElementById('preview').src = '../../' + data.profilePicture;
+                        } else {
+                            document.getElementById('preview').src = '../image/usericon.png';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching profile data:', error);
+                });
+        }
+
+        cancelBtn.addEventListener('click', () => {
+            if (isAdminViewingUser()) {
+                window.location.href = 'userManagement.html';
+            } else {
+                window.location.href = 'profile.html';
+            }
+        });
+
+        form.addEventListener('submit', saveProfile);
+
+        document.addEventListener('DOMContentLoaded', loadProfileData);
+        
+        function uploadProfilePicture() {
+            const profilePicInput = document.getElementById('profilePicInput');
+            if (!profilePicInput.files.length) {
+                showToast('No file selected', 'error');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('profilePicture', profilePicInput.files[0]);
+            
+            fetch('../..//profilePicture.php', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showToast(data.message, 'success');
+                    document.getElementById('preview').src = '../../' + data.profilePicture;
+                } else {
+                    showToast(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error uploading profile picture:', error);
+                showToast('Failed to upload profile picture. Please try again.', 'error');
+            });
+        }
+        document.getElementById('profilePicInput').addEventListener('change', uploadProfilePicture);
+    </script>
+</body>
+</html>

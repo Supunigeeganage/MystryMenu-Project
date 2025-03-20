@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+    <link rel="stylesheet" href="../css/admin_view.css?v=1.5">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/toast.css?v=1.2">
+    <script src="../utility/accessControl.js"></script>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <h2><span class="gold">M</span>ystry<span class="gold">M</span>enu <a href="./dashboard.html"><img src="../image/logo.jpg" alt="Logo"></a></h2> 
+            </div>
+            <ul class="menu">
+                <li><a href="./recipeManagment.html" class="active">Recipe Management</a></li>
+                <li><a href="./userManagement.html">User Management</a></li>
+                <li><a href="./poisonousRecipes.html">Poisonous Recipes</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <header>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search recipes by name or ingredients" 
+                           onkeyup="if (event.key === 'Enter') searchRecipes(this.value)">
+                    <button onclick="searchRecipes(document.getElementById('searchInput').value)">
+                        <i class="fas fa-search" style="color: rgb(190, 190, 190);"></i>
+                    </button>
+                </div>
+                <div class="header-icons">
+                    <a href="./profile.html"><img src="../image/usericon.png" alt=""></a>
+                </div>
+            </header>
+            <div class="admin">
+                <p>Admin</p>
+            </div>
+            <section class="recipes" id="recipesContainer">
+                <!-- Recipes will be loaded here dynamically -->
+            </section>
+        </main>
+    </div>
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Load all recipes
+        function loadAllRecipes() {
+            fetch('../../getFilteredRecipes.php?type=all')
+                .then(response => response.json())
+                .then(data => {
+                    const recipesContainer = document.getElementById('recipesContainer');
+                    recipesContainer.innerHTML = '';
+
+                    if (data.status === 'success' && data.recipes.length > 0) {
+                        data.recipes.forEach(recipe => {
+                            const recipeElement = document.createElement('div');
+                            recipeElement.className = 'recipe';
+                            recipeElement.innerHTML = `
+                                <img src="${recipe.image ? '../../' + recipe.image : '../image/recipe1.jpeg'}" 
+                                     alt="${recipe.name}"
+                                     style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px;"
+                                     onerror="this.src='../image/recipe1.jpeg'">
+                                <p>${recipe.name}</p>
+                                <button class="view-btn" onclick="viewRecipe(${recipe.recipe_id})">View</button>
+                                <button class="delete-btn" onclick="deleteRecipe(${recipe.recipe_id})">Delete</button>
+                            `;
+                            recipesContainer.appendChild(recipeElement);
+                        });
+                    } else {
+                        recipesContainer.innerHTML = '<p>No recipes found.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('recipesContainer').innerHTML = '<p>Error loading recipes.</p>';
+                });
+        }
+
+        // View recipe
+        function viewRecipe(recipeId) {
+            window.location.href = `recipe_view.html?id=${recipeId}`;
+        }
+
+        // search function
+        function searchRecipes(query) {
+            if (!query.trim()) return loadAllRecipes();
+            
+            fetch(`../../searchRecipes.php?query=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const recipesContainer = document.getElementById('recipesContainer');
+                    recipesContainer.innerHTML = '';
+                    
+                    if (data.status === 'success' && data.recipes.length > 0) {
+                        data.recipes.forEach(recipe => {
+                            const recipeElement = document.createElement('div');
+                            recipeElement.className = 'recipe';
+                            recipeElement.innerHTML = `
+                                <img src="${recipe.image ? '../../' + recipe.image : '../image/recipe1.jpeg'}" 
+                                     alt="${recipe.name}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px;"
+                                     onerror="this.src='../image/recipe1.jpeg'">
+                                <p>${recipe.name}</p>
+                                <button class="view-btn" onclick="viewRecipe(${recipe.recipe_id})">View</button>
+                                <button class="delete-btn" onclick="deleteRecipe(${recipe.recipe_id})">Delete</button>
+                            `;
+                            recipesContainer.appendChild(recipeElement);
+                        });
+                    } else {
+                        recipesContainer.innerHTML = '<p>No recipes found matching your search.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Failed to search recipes', 'error');
+                });
+        }
+
+        // Delete recipe
+        function deleteRecipe(recipeId) {
+            if (confirm('Are you sure you want to delete this recipe?')) {
+                fetch('../../deleteRecipe.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ recipe_id: recipeId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Delete response:', data);
+                    if (data.status === 'success') {
+                        showToast('Recipe deleted successfully', 'success');
+                        setTimeout(() => {
+                            // if in search mode
+                            const searchQuery = document.getElementById('searchInput').value.trim();
+                            if (searchQuery) {
+                                searchRecipes(searchQuery);
+                            } else {
+                                loadAllRecipes();
+                            }
+                        }, 500);
+                    } else {
+                        showToast(data.message || 'Error deleting recipe', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Failed to delete recipe', 'error');
+                });
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Load recipes when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllRecipes();
+            loadProfilePicture();
+        });
+
+        function loadProfilePicture() {
+            fetch('../../get_user_profile.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.profilePicture) {
+                        const profilePicElement = document.querySelector('.header-icons img');
+                        profilePicElement.src = '../../' + data.profilePicture;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching profile picture:', error);
+                });
+        }
+    </script>
+</body>
+</html>

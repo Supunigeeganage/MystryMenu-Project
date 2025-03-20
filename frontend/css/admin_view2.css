@@ -1,0 +1,306 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: rgba(120, 239, 248, 1);
+    overflow: hidden;
+}
+
+.container {
+    display: flex;
+}
+
+.sidebar {
+    width: 17%;
+    background-color: #000000;
+    border-right: 1px solid #ccc;
+    padding: 20px;
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-left: 80px;
+    font-family: 'Times New Roman';
+    color: white;
+}
+
+.logo img {
+    width: 130px; /* Adjust size as needed */
+    margin-left: 10px; /* Adds space between text and logo */
+    border-radius: 50%; /* Makes the image circular */
+
+}
+.gold {
+    color: gold; /* Gold color for the 'M' */
+    font-family: 'Times New Roman';
+    font-size: 40px;
+}
+
+.main-content {
+    width: 80%;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full viewport height */
+}
+
+header {
+    display: flex;
+    justify-content: center; /* Centers the search bar */
+    align-items: center;
+    position: relative;
+}
+
+.header-icons{
+    position: absolute;
+    right: 40px; /* Position icons next to the login/signup buttons */
+    display: flex;
+    gap: 40px;
+    font-size: 30px;
+    color: #000;
+    cursor: pointer;
+    margin-top: 20px;
+    
+}
+.header-icons i:hover {
+    background-color: rgba(200, 200, 200, 0.5); /* Change to the desired color */
+    border-radius: 50%; /* Optional: makes the background circular */
+    padding: 2px; /* Optional: add some padding around the icon */
+    transform: scale(1.2);
+}
+.header-icons i {
+    width: 40px; /* Set fixed width */
+    height: 40px; /* Set fixed height */
+    line-height: 40px; /* Align icon vertically */
+    text-align: center; /* Align icon horizontally */
+    display: inline-block; /* Ensure it behaves like a box */
+    border-radius: 50%; /* Make it circular */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+    position: relative;
+}
+
+
+.recipes {
+    flex: 1; /* Takes up the remaining space */
+    overflow-y: auto; /* Makes only this section scrollable */
+    margin-bottom: 10px;
+    margin-left: 95px;
+}
+.recipes::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Edge */
+}
+
+.recipes {
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none; /* For Internet Explorer and Edge */
+}
+
+.user{
+    font-size: 33px;
+}
+
+.topic p{
+    margin-top: 70px;
+    font-size: 28px;
+    font-weight: bold;
+    margin-left: 430px;
+    margin-bottom: 40px;
+
+}
+
+.admin p {
+    margin-left: 945px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.menu {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+    margin-top: 100px;
+}
+
+.menu li {
+    margin: 15px 0;
+}
+
+.menu a {
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+}
+
+.menu a i {
+    margin-right: 20px;
+    margin-left: 10px;
+    font-size: 20px;
+    color: #000000;
+}
+
+.menu a:hover {
+    background-color: rgba(0, 255, 255, 0.2); /* Light green background */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow for box effect */
+    transform: scale(1.05); /* Slightly enlarge the item */
+    color: #007bff; /* Change text color on hover */
+}
+
+.menu a:hover i {
+    color: #007bff; /* Change icon color on hover */
+}
+.menu a.active {
+    background-color: rgba(68, 215, 252, 0.5); /* Slightly darker green for the locked state */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Stronger shadow */
+    transform: scale(1.05); /* Slightly enlarged */
+    color: #007bff; /* Blue text color */
+    font-weight: bold;
+}
+
+.menu a.active i {
+    color: #007bff; /* Match the icon color to the text */
+}
+
+.header-icons img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin-top: -20px;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    border: 1px solid #504f4f;
+    border-radius: 30px;
+    overflow: hidden; /* Ensures the button stays inside the bar */
+    width: 500px; /* Adjust the width as needed */
+    font-size: small;
+    font-family: 'Times New Roman';
+    padding: 5px;
+    padding-left: 20px;
+    background-color: #ffffff;
+}
+.search-bar input {
+    flex: 1;
+    border: none;
+    font-size: 16px;
+    outline: none; /* Removes focus outline */
+}
+.search-bar button {
+    background-color: white;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* Recipe card styles */
+.recipe-card {
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    padding-left: 50px;
+    padding-right: 50px;
+    margin-bottom: 20px;
+    width: 90%;
+    align-items: center;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.recipe-card .recipe-header {
+    display: flex;
+    align-items: center;
+    width: 50%;
+}
+
+.recipe-card .recipe-header div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-right: 40px;
+}
+
+.recipe-card h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.recipe-card .recipe-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    margin-right: 30px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.recipe-card .action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    align-items: center;
+    width: 50%;
+}
+
+/* button style for all action buttons */
+.recipe-card .view-btn,
+.recipe-card .approve-btn,
+.recipe-card .delete-btn {
+    height: 40px;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 30px;
+    background-color: rgb(7, 7, 7);
+    color: #fff;
+    font-size: 16px;
+    margin-top: 0;
+    margin-right: 10px;
+}
+
+/* hover effects */
+.recipe-card .view-btn:hover {
+    background-color: rgb(113, 98, 243);
+}
+
+.recipe-card .approve-btn:hover {
+    background-color: #4caf50;
+}
+
+.recipe-card .delete-btn:hover {
+    background-color: red;
+}
+
+.recipe-status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.status-pending {
+    background-color: #ffd700;
+    color: #333;
+}
+

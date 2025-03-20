@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile</title>
+  <link rel="stylesheet" href="../css/profile.css?v=2.5">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css?v=2.0">
+  <link rel="stylesheet" href="../css/toast.css?v=1.2">
+  <script src="../utility/SearchRecipes.js"></script>
+  <script src="../utility/accessControl.js"></script>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <h2><span class="gold">M</span>ystry<span class="gold">M</span>enu <a href="./dashboard.html"><img src="../image/logo.jpg" alt="Logo"></a></h2> 
+            </div>
+            <ul class="menu">
+                <li><a href="./dashboard.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="./recipeManagment.html"><i class="fas fa-user-shield"></i> Admin Portal</a></li>
+                <li><a href="./edit_profile.html"><i class="fas fa-edit"></i> Edit Profile</a></li>
+                <li><a href="" class="delete-profile"><i class="fas fa-trash-alt"></i> Delete Profile</a></li>
+                <li><a href="./add_recipe.html"><i class="fas fa-plus-circle"></i> Add Recipe</a></li>
+                <li><a href="#" onclick="Logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </aside> 
+        <main class="main-content">
+            <header>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search" id="searchInput" 
+                           onkeyup="if (event.key === 'Enter') searchRecipes(this.value, true)">
+                    <button onclick="searchRecipes(document.getElementById('searchInput').value, true)">
+                        <i class="fas fa-search" style="color: rgb(190, 190, 190);"></i>
+                    </button>
+                </div>
+            </header>
+            <div class="profile-header">
+                <div class="heading"> 
+                    <img src="../image/proicon.png" alt="Icon" class="icon"><h2>Profile</h2>
+                </div>
+                <div class="profile-pic">
+                    <img id="preview" src="../image/usericon.png" alt="Profile Picture">
+                </div>
+            </div>
+            <h3>My Recipe</h3>
+            <section class="recipes" id="recipesContainer">
+            </section>
+        </main>
+    </div>
+    <script>
+        function loadProfileData() {
+            fetch('../../get_user_profile.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        if (data.profilePicture) {
+                            document.getElementById('preview').src = '../../' + data.profilePicture;
+                        } else {
+                            document.getElementById('preview').src = '../image/usericon.png';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching profile data:', error);
+                });
+        }
+
+        // logout
+        function Logout() {
+            fetch('../../logout.php', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = './login.html?logout=1';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                    window.location.href = './login.html';
+            });
+            
+            return false;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('../../get_user_profile.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'error') {
+                        window.location.href = './login.html';
+                        return;
+                    }
+
+                    // admin portal visibility
+                    const adminPortalLink = document.querySelector('a[href="./recipeManagment.html"]');
+                    if (adminPortalLink && data.user_type !== 'admin') {
+                        adminPortalLink.style.display = 'none';
+                    }
+
+                    loadProfileData();
+                    loadUserRecipes();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    window.location.href = './login.html';
+                });
+        });
+        
+        //delete user profile
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteLink = document.querySelector('.delete-profile');
+            
+            deleteLink.addEventListener('click', function(event) {
+                event.preventDefault();
+                
+                if (confirm('Are you sure you want to delete your profile?')) {
+                    fetch('../../deleteProfile.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text();
+                    })
+                    .then(text => {
+                        try {
+                            const data = JSON.parse(text);
+                            if (data.status === 'success') {
+                                showToast('Profile deleted successfully', 'success');
+                                setTimeout(() => {
+                                    window.location.href = './signup.html';
+                                }, 1000);
+                            } else {
+                                showToast(data.message || 'Error deleting profile', 'error');
+                            }
+                        } catch (e) {
+                            console.error('Error parsing JSON:', text);
+                            showToast('Invalid server response', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('Failed to delete profile. Please try again.', 'error');
+                    });
+                }
+            });
+        });
+
+        const toastDiv = document.createElement('div');
+        toastDiv.id = 'toast';
+        toastDiv.className = 'toast';
+        document.body.appendChild(toastDiv);
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // load user's recipes
+        function loadUserRecipes() {
+            fetch('../../getUserRecipes.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const recipesContainer = document.getElementById('recipesContainer');
+                        recipesContainer.innerHTML = '';
+
+                        data.recipes.forEach(recipe => {
+                            const recipeElement = document.createElement('div');
+                            recipeElement.className = 'recipe';
+                            recipeElement.innerHTML = `
+                                <img src="${recipe.image ? '../../' + recipe.image : '../image/recipe1.jpeg'}" 
+                                     alt="${recipe.name}" 
+                                     onclick="window.location.href='recipe_view.html?id=${recipe.recipe_id}'"
+                                     style="cursor: pointer;"
+                                     onerror="this.src='../image/recipe1.jpeg'">
+                                <p onclick="window.location.href='recipe_view.html?id=${recipe.recipe_id}'" 
+                                   style="cursor: pointer;">${recipe.name}</p>
+                                <i class="fas fa-edit edit-icon" onclick="editRecipe(${recipe.recipe_id})"></i>
+                                <i class="fas fa-share-alt share-icon" onclick="shareRecipe(${recipe.recipe_id})"></i>
+                                <i class="fas fa-trash-alt delete-icon" onclick="deleteRecipe(${recipe.recipe_id})"></i>
+                            `;
+                            
+                            recipesContainer.appendChild(recipeElement);
+                        });
+                    } else {
+                        showToast('No recipes found', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading recipes:', error);
+                    showToast('Error loading recipes', 'error');
+                });
+        }
+
+        // delete a recipe
+        function deleteRecipe(recipeId) {
+            if (confirm('Are you sure you want to delete this recipe?')) {
+                fetch('../../deleteRecipe.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ recipe_id: recipeId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showToast('Recipe deleted successfully', 'success');
+                        fetch('../../getUserRecipes.php')
+                            .then(response => response.json())
+                            .then(recipesData => {
+                                if (!recipesData.recipes || recipesData.recipes.length === 0) {
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 500);
+                                } else {
+                                    loadUserRecipes();
+                                }
+                            })
+                            .catch(() => {
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1000);
+                            });
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Failed to delete recipe', 'error');
+                });
+            }
+        }
+
+        // edit a recipe
+        function editRecipe(recipeId) {
+            window.location.href = `edit_recipe.html?id=${recipeId}`;
+        }
+
+        // share a recipe
+        function shareRecipe(recipeId) {
+            fetch(`../../getRecipeDetails.php?id=${recipeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        localStorage.setItem('sharedRecipe', JSON.stringify(data.recipe));
+                        window.location.href = `share_recipe.html?id=${recipeId}`;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>

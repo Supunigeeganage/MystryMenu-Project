@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MystryMenu</title>
+  <link rel="stylesheet" href="../css/recipe_view.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="../css/toast.css">
+  <script src="../utility/SearchRecipes.js"></script>
+  <script src="../utility/accessControl.js"></script>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <h2><span class="gold">M</span>ystry<span class="gold">M</span>enu <a href="./dashboard.html"><img src="../image/logo.jpg" alt="Logo" class="logimg"></h2> </a> 
+                <section class="related-recipes">
+                    <div class="recipe-list">
+                        <!--sidebar recipes will be loaded here from the backend db dynamically -->
+                    </div>
+                </section>
+            </div>
+        </aside>
+        <main class="main-content">
+            <header>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search" id="searchInput" 
+                           onkeyup="if (event.key === 'Enter') redirectToSearch(this.value)">
+                    <button onclick="redirectToSearch(document.getElementById('searchInput').value)">
+                        <i class="fas fa-search" style="color: rgb(190, 190, 190);"></i>
+                    </button>
+                </div>
+                <div class="header-icons">
+                    <a href="./save_recipe.html"<i class="fas fa-download download" style="margin-top: 5px;"></i></a>
+                    <a href="./profile.html">
+                        <i class="fas fa-user-circle" id="default-profile"></i>
+                        <img src="" alt="" id="profile-pic">
+                    </a>
+                </div>
+                <br>
+            </header>
+            <div class="recipe-name">
+                <p></p>
+ 
+                <span class="recipe-creator">By <span id="recipe-creator-name"></span></span>
+            </div>
+            <div class="view">
+                <section class="recipe-details">
+                    <img src="../image/recipe4.jpeg" alt="Recipe Image">
+                    <div class="recipe-content">
+                        <h2 class="section-heading">Ingredients</h2>
+                        <div id="recipe-ingredients" class="ingredient-list"></div>
+                        
+                        <h2 class="section-heading">Recipe Method Description</h2>
+                        <div id="recipe-method" class="method-description"></div>
+                    </div>
+                    <div class="actions">
+                        <button class="heart-btn">
+                            <i class="fas fa-heart"></i>
+                            <span class="heart-count">0</span>
+                        </button>
+                        <script>
+                            document.querySelector('.heart-btn').addEventListener('click', function () {
+                              this.classList.toggle('clicked');
+                            });
+                        </script>
+                        <button><i class="fas fa-download download-icon"></i></button>
+                        <a href="./share_recipe.html"><button><i class="fas fa-share-alt share-icon"></i></button></a>
+                    </div>
+                    <section class="feedback">
+                        <h3>Feedback</h3>
+                        <textarea id="commentInput" placeholder="Add your feedback"></textarea>
+                        <br>
+                        <button onclick="addComment()">Add</button>
+                        <div id="commentsList">
+                            <!-- Comments will be loaded here -->
+                        </div>
+                    </section>
+                </section>
+            </div>
+        </main>
+    </div>
+    <div class="recipes">
+        <!-- Search results will appear here -->
+    </div>
+    <script>
+    function loadRelatedRecipes() {
+        fetch('../../getFilteredRecipes.php?type=all')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const recipeList = document.querySelector('.recipe-list');
+                    recipeList.innerHTML = '';
+
+                    const recipes = data.recipes.slice(0, 10);
+                    
+                    recipes.forEach(recipe => {
+                        const recipeElement = document.createElement('div');
+                        recipeElement.className = 'recipe';
+                        recipeElement.innerHTML = `
+                            <img src="${recipe.image ? '../../' + recipe.image : '../image/recipe1.jpeg'}" 
+                                 alt="${recipe.name}"
+                                 onclick="viewRecipe(${recipe.recipe_id})"
+                                 style="cursor: pointer;"
+                                 onerror="this.src='../image/recipe1.jpeg'">
+                            <p>${recipe.name}</p>
+                        `;
+                        recipeList.appendChild(recipeElement);
+                    });
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    //  view recipe Function 
+    function viewRecipe(recipeId) {
+        window.location.href = `recipe_view.html?id=${recipeId}`;
+    }
+
+    function loadProfilePicture() {
+        fetch('../../get_user_profile.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.profilePicture) {
+                    const profilePicElement = document.getElementById('profile-pic');
+                    const defaultProfile = document.getElementById('default-profile');
+                    profilePicElement.src = '../../' + data.profilePicture;
+                    profilePicElement.style.display = 'inline';
+                    defaultProfile.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        loadProfilePicture();
+        loadRelatedRecipes();
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('id');
+
+        if (recipeId) {
+            fetch(`../../getRecipeDetails.php?id=${recipeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const recipe = data.recipe;
+                        
+                        document.querySelector('.recipe-name p').textContent = recipe.name;
+                        
+                        // Display creator's name if available
+                        if (recipe.firstName && recipe.lastName) {
+                            document.getElementById('recipe-creator-name').textContent = 
+                                `${recipe.firstName} ${recipe.lastName}`;
+                        } else {
+                            document.getElementById('recipe-creator-name').textContent = 'Unknown user';
+                        }
+                        
+                        const recipeImage = document.querySelector('.recipe-details img');
+                        recipeImage.src = recipe.image ? '../../' + recipe.image : '../image/recipe4.jpeg';
+                        
+                        document.getElementById('recipe-ingredients').innerHTML = formatIngredients(recipe.ingredient);
+                        document.getElementById('recipe-method').innerHTML = formatMethod(recipe.method);
+                    } else {
+                        console.error('Error loading recipe:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    });
+
+    function formatIngredients(ingredients) {
+        return ingredients.split('\n')
+            .filter(ingredient => ingredient.trim())
+            .map(ingredient => `<p>${ingredient.trim()}</p>`)
+            .join('');
+    }
+
+    function formatMethod(method) {
+        return method.split('\n')
+    }
+
+    function showToast(message, type = 'error') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `toast ${type}`;
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+
+    function saveRecipe(recipeId) {
+        fetch('../../saveRecipe.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `recipe_id=${recipeId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'own_recipe') {
+                const confirmSave = confirm('This is your own recipe. Are you sure you want to save it to your collection?');
+                if (confirmSave) {
+                    fetch('../../saveRecipe.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `recipe_id=${recipeId}&force_save=true`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            showToast('Recipe saved successfully', 'success');
+                        } else {
+                            showToast(data.message, 'error');
+                        }
+                    });
+                }
+            } else if (data.status === 'success') {
+                showToast('Recipe saved successfully', 'success');
+            } else {
+                showToast(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error saving recipe', 'error');
+        });
+    }
+
+    // download button
+    document.querySelector('.download-icon').addEventListener('click', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('id');
+        if (recipeId) {
+            saveRecipe(recipeId);
+        }
+    });
+
+    function redirectToSearch(searchTerm) {
+        if (searchTerm.trim()) {
+            window.location.href = `dashboard.html?search=${encodeURIComponent(searchTerm)}`;
+        }
+    }
+
+    // To add a new comment
+    function addComment() {
+        const commentText = document.getElementById('commentInput').value;
+        if (!commentText.trim()) {
+            showToast('Please enter a comment');
+            return;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('id');
+
+        fetch('../../addFeedback.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                recipe_id: recipeId,
+                comment: commentText
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showToast('Comment added successfully', 'success');
+                document.getElementById('commentInput').value = '';
+                loadComments();
+            } else if (data.message === 'not_logged_in') {
+                window.location.href = 'signup.html';
+            } else {
+                showToast(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error adding comment', 'error');
+        });
+    }
+
+    // load comments
+    function loadComments() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('id');
+        const commentsList = document.getElementById('commentsList');
+        
+        commentsList.innerHTML = '';
+
+        fetch(`../../getComments.php?recipe_id=${recipeId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    data.comments.forEach(comment => {
+                        const commentDiv = document.createElement('div');
+                        commentDiv.className = 'comment';
+                        commentDiv.innerHTML = `
+                            <div class="comment-header">
+                                <span class="username">${comment.firstName || ''} ${comment.lastName || ''}</span>
+                            </div>
+                            <div class="comment-content">
+                                <p>${comment.comment}</p>
+                            </div>
+                        `;
+                        commentsList.appendChild(commentDiv);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error loading comments', 'error');
+            });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        loadComments();
+    });
+
+    // share recipe
+    function shareRecipe(recipeId) {
+        fetch(`../../getRecipeDetails.php?id=${recipeId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    localStorage.setItem('sharedRecipe', JSON.stringify(data.recipe));
+                    localStorage.setItem('returnTo', 'recipe_view');
+                    window.location.href = `share_recipe.html?id=${recipeId}`;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+    document.querySelector('.share-icon').parentElement.onclick = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('id');
+        shareRecipe(recipeId);
+        return false;
+    };
+
+    function Heart() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('id');
+        const heartBtn = document.querySelector('.heart-btn');
+        const isCurrentlyHearted = heartBtn.classList.contains('clicked');
+
+        heartBtn.classList.toggle('clicked');
+        
+        // Update count
+        const currentCount = parseInt(document.querySelector('.heart-count').textContent);
+        document.querySelector('.heart-count').textContent = isCurrentlyHearted ? currentCount - 1 : currentCount + 1;
+        
+        fetch('../../getRecipeDetails.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                recipe_id: recipeId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.querySelector('.heart-count').textContent = data.hearts;
+            } else if (data.message === 'not_logged_in') {
+                heartBtn.classList.toggle('clicked');
+                window.location.href = 'signup.html';
+            }
+        })
+        .catch(error => {
+            heartBtn.classList.toggle('clicked');
+            document.querySelector('.heart-count').textContent = currentCount;
+            console.error('Error:', error);
+        });
+    }
+    document.querySelector('.heart-btn').addEventListener('click', function () {
+        this.classList.toggle('clicked');
+        Heart();
+    });
+
+    // Initial load
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('id');
+        
+        fetch(`../../getRecipeDetails.php?id=${recipeId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const heartBtn = document.querySelector('.heart-btn');
+                    if (data.hasHearted) {
+                        heartBtn.classList.add('clicked');
+                    }
+                    document.querySelector('.heart-count').textContent = data.hearts;
+                }
+            });
+    });
+
+    </script>
+    <div id="toast" class="toast"></div>
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Recipe</title>
+    <link rel="stylesheet" href="../css/edit_recipe.css?v=1.4">
+    <link rel="stylesheet" href="../css/toast.css?v=1.0">
+    <script src="../utility/accessControl.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <img src="../image/logo.jpg" alt="MystryMenu Logo" class="logo">
+        </div>
+        <div class="content">
+            <div class="profile-header">
+                <div class="heading">            
+                    <img src="../image/editrepicon.png" alt="Icon" class="icon">
+                    <h2>Edit Recipe</h2>
+                    <div class="change-recipe">
+                        <img src="../image/recipe6.jpeg" alt="Add Image Icon" class="add-image-icon">
+                        <input type="file" id="changereciInput" accept="image/*">
+                        <label for="changereciInput">Change your recipe image</label>
+                    </div>
+                </div>               
+            </div>
+            
+            <form class="form" id="editRecipeForm">
+                <section class="form-groupsp">
+                    <div class="form-group">
+                        <label for="recipe-name">Recipe Name</label>
+                        <input type="text" id="recipe-name" name="recipe-name" placeholder="Enter recipe name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="type">Type</label>
+                        <select id="type" name="type" required>
+                            <option value="">Select Type</option>
+                            <option>Breakfast</option>
+                            <option>Lunch</option>
+                            <option>Dinner</option>
+                            <option>Vegetarian</option>
+                            <option>Sweets</option>
+                            <option>Drinks</option>
+                            <option>Cakes</option>
+                        </select>
+                    </div>
+                    <div class="ingre">
+                        <label for="ingredient">Ingredient</label>
+                        <textarea id="ingredient" name="ingredient" placeholder="Enter ingredients separated by commas" required></textarea>
+                        <small class="form-tip">Please separate each ingredient with a comma (e.g., "2 cups flour, 1 cup sugar, 3 eggs")</small>
+                    </div>
+                    <div class="meth">
+                        <label for="method">Method</label>
+                        <textarea id="method" name="method" placeholder="Enter cooking method" required></textarea>
+                    </div>
+                </section>
+                <div class="button-group">
+                    <button type="button" class="cancel" onclick="window.history.back()">Cancel</button>
+                    <button type="submit" class="add">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Single Warning Popup for all poisonous ingredients cases -->
+    <div class="warning-popup" id="warningPopup">
+        <div class="warning-content">
+            <h3>⚠️ Warning: Poisonous Ingredients Detected!</h3>
+            <p id="warningMessage">The following ingredients are potentially harmful:</p>
+            <p id="poisonousIngredientsList"></p>
+            <p>Please remove the poisonous ingredients to continue.</p>
+            <div class="warning-buttons">
+                <button onclick="closeWarningPopup()">I Understand</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let recipeId;
+        let isEditingPoisonousRecipe = false;
+
+        const toastDiv = document.createElement('div');
+        toastDiv.id = 'toast';
+        toastDiv.className = 'toast';
+        document.body.appendChild(toastDiv);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            recipeId = urlParams.get('id');
+            const recipeType = urlParams.get('type') || '';
+            
+            if (!recipeId) {
+                showToast('Recipe ID not found', 'error');
+                return;
+            }
+            
+            // Set up the page based on recipe type
+            if (recipeType === 'poisonous') {
+                isEditingPoisonousRecipe = true;
+                document.querySelector('h2').textContent = 'Edit Poisonous Recipe';
+                loadPoisonousRecipe(recipeId);
+            } else {
+                loadRecipeDetails();
+            }
+        });
+
+        function loadRecipeDetails() {
+            fetch(`../../getRecipeDetails.php?id=${recipeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const recipe = data.recipe;
+                        document.getElementById('recipe-name').value = recipe.name;
+                        document.getElementById('type').value = recipe.type;
+                        document.getElementById('ingredient').value = recipe.ingredient;
+                        document.getElementById('method').value = recipe.method;
+                        if (recipe.image) {
+                            document.querySelector('.add-image-icon').src = '../../' + recipe.image;
+                        }
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Error loading recipe details', 'error');
+                });
+        }
+        
+        // load poisonous recipes
+        function loadPoisonousRecipe(recipeId) {
+            fetch('../../getPoisonousRecipes.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Find the specific recipe
+                        const recipe = data.recipes.find(r => r.poisonous_recipe_id === parseInt(recipeId));
+                        
+                        if (recipe) {
+                            // Populate form fields
+                            document.getElementById('recipe-name').value = recipe.name;
+                            document.getElementById('type').value = recipe.type;
+                            document.getElementById('ingredient').value = recipe.ingredient;
+                            document.getElementById('method').value = recipe.method;
+                            
+                            // Display image if available
+                            if (recipe.image) {
+                                document.querySelector('.add-image-icon').src = '../../' + recipe.image;
+                            }
+                            
+                            // Display and highlight poisonous ingredients
+                            const poisonousIngredients = recipe.poisonous_ingredients || [];
+                            if (poisonousIngredients.length > 0) {
+                                // Highlight the ingredient field with red border
+                                document.getElementById('ingredient').classList.add('ingredient-highlight');
+                                
+                                // Show warning popup
+                                document.getElementById('warningMessage').textContent = 'This recipe contains the following poisonous ingredients:';
+                                document.getElementById('poisonousIngredientsList').textContent = poisonousIngredients.join(', ');
+                                document.getElementById('warningPopup').style.display = 'flex';
+                        
+                            }
+                        } else {
+                            showToast('Recipe not found', 'error');
+                            setTimeout(() => {
+                                window.location.href = 'poisonousRecipes.html';
+                            }, 2000);
+                        }
+                    } else {
+                        showToast(data.message || 'Error loading recipe', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Error loading recipe details', 'error');
+                });
+        }
+
+        function closeWarningPopup() {
+            document.getElementById('warningPopup').style.display = 'none';
+            // Focus on ingredients field to help user make changes
+            document.getElementById('ingredient').focus();
+        }
+
+        //image preview
+        document.getElementById('changereciInput').addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.querySelector('.add-image-icon').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        //form submission
+        document.getElementById('editRecipeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Always check for poisonous ingredients before submitting
+            const ingredient = document.getElementById('ingredient').value;
+            
+            // If no ingredient value  show  error
+            if (!ingredient.trim()) {
+                showToast('Ingredients field cannot be empty', 'error');
+                return;
+            }
+            
+            // Create a temporary form to check for poisonous ingredients
+            const checkForm = new FormData();
+            checkForm.append('recipe-name', document.getElementById('recipe-name').value);
+            checkForm.append('type', document.getElementById('type').value);
+            checkForm.append('ingredient', ingredient);
+            checkForm.append('method', document.getElementById('method').value);
+            checkForm.append('check_only', 'true'); 
+            
+            try {
+                const checkResponse = await fetch('../../addRecipe.php', {
+                    method: 'POST',
+                    body: checkForm,
+                    credentials: 'include'
+                });
+                
+                const checkData = await checkResponse.json();
+                
+                // If poisonous ingredients are found, show warning and don't submit
+                if (checkData.warning && checkData.poisonous) {
+                    document.getElementById('warningMessage').textContent = 'The following ingredients are potentially harmful:';
+                    document.getElementById('poisonousIngredientsList').textContent = checkData.ingredients.join(', ');
+                    document.getElementById('warningPopup').style.display = 'flex';
+                    document.getElementById('ingredient').classList.add('ingredient-highlight');
+                    return;
+                }
+                
+                // Continue with actual form submission if no poisonous ingredients
+                submitForm();
+                
+            } catch (error) {
+                console.error('Error checking ingredients:', error);
+                showToast('Error checking ingredients', 'error');
+            }
+        });
+        
+        // Function to submit the form 
+        async function submitForm() {
+            const formData = new FormData(document.getElementById('editRecipeForm'));
+            
+            // Make sure recipe_id is properly added to the form data
+            console.log("Recipe ID being submitted:", recipeId);
+            formData.append('recipe_id', recipeId);
+            
+            // Add image if selected
+            const imageInput = document.getElementById('changereciInput');
+            if (imageInput.files.length > 0) {
+                formData.append('recipe-image', imageInput.files[0]);
+            }
+
+            // Determine if we're editing a poisonous recipe
+            const endpoint = isEditingPoisonousRecipe ? 
+                '../../updateRecipe.php?type=poisonous' : 
+                '../../updateRecipe.php';
+
+            try {
+                // Log form data for debugging
+                console.log("Form data being sent:", Object.fromEntries(formData));
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                console.log("Update response:", data);
+                
+                if (data.success) {
+                    showToast('Recipe updated successfully!', 'success');
+                    
+                    // For poisonous recipes, check if there are still poisonous ingredients
+                    if (isEditingPoisonousRecipe && data.poisonousIngredients && data.poisonousIngredients.length > 0) {
+                        document.getElementById('poisonousIngredientsList').textContent = data.poisonousIngredients.join(', ');
+                        document.getElementById('warningPopup').style.display = 'flex';
+                        document.getElementById('ingredient').classList.add('ingredient-highlight');
+                    } else if (isEditingPoisonousRecipe) {
+                        // All poisonous ingredients removed
+                        document.getElementById('ingredient').classList.remove('ingredient-highlight');
+                        showToast('All poisonous ingredients have been removed!', 'success');
+                        
+                        // Redirect to poisonous recipes page
+                        setTimeout(() => {
+                            window.location.href = 'poisonousRecipes.html';
+                        }, 2000);
+                    } else {
+                        setTimeout(() => {
+                            window.location.href = 'profile.html';
+                        }, 2000);
+                    }
+                } else {
+                    showToast(data.message || 'Error updating recipe', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred while updating the recipe', 'error');
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+    <div id="toast" class="toast"></div>
+</body>
+</html>

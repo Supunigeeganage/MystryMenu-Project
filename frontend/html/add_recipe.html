@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Recipe</title>
+    <link rel="stylesheet" href="../css/add_recipe.css?v=1.9">
+    <link rel="stylesheet" href="../css/toast.css?v=1.24">
+    <script src="../utility/accessControl.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <img src="../image/logo.jpg" alt="MystryMenu Logo" class="logo">
+        </div>
+        <div class="content">
+            <div class="profile-header">
+                <div class="heading">            
+                    <img src="../image/addrep.png" alt="Icon" class="icon">
+                    <h2>Add Recipe</h2>
+                    <div class="form-group">
+                        <label for="image-upload" class="image-upload">
+                            <div class="upload-placeholder">
+                                <img id="preview" src="../image/addimg.png" alt="Recipe Image" class="add-image-icon">
+                                <input type="file" id="image-upload" name="recipe-image" accept="image/*">
+                                <span id="image-label">Add Recipe Image</span>
+                            </div>
+                        </label>
+                    </div>                    
+                </div>               
+            </div>
+            <form id="recipeForm" class="form" action="../../backend/addRecipe.php" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <div class="form-group">
+                        <label for="recipe-name">Recipe Name</label>
+                        <input type="text" id="recipe-name" name="recipe-name" placeholder="Enter recipe name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="type">Type</label>
+                        <select id="type" name="type" required>
+                          <option value="">Select Type</option>
+                          <option>Breakfast</option>
+                          <option>Lunch</option>
+                          <option>Dinner</option>
+                          <option>Vegetarian</option>
+                          <option>Sweets</option>
+                          <option>Drinks</option>
+                          <option>Cakes</option>
+                        </select> 
+                    </div>
+                    <div class="form-group">
+                        <label for="ingredient">Ingredient</label>
+                        <input type="text" id="ingredient" name="ingredient" placeholder="Enter ingredients separated by commas" required>
+                        <small class="form-tip">Please separate each ingredient with a comma (eg: 2 cups flour,1 cup sugar,3 eggs)</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="method">Method</label>
+                        <textarea id="method" name="method" placeholder="Enter cooking method" required></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button type="button" class="cancel" onclick="window.history.back()">Cancel</button>
+                        <button type="submit" class="add">Add</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="warningModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3> ⚠️ Warning Poisonous Ingredients Detected!</h3>
+            <p id="warningMessage"></p>
+            <div class="modal-buttons">
+                <button id="editRecipe">Edit Recipe</button>
+                <button id="continueAnyway">Continue Anyway</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const form = document.getElementById('recipeForm');
+        if (form) {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const imageInput = document.getElementById('image-upload');
+                if (imageInput.files.length > 0) {
+                    formData.append('recipe-image', imageInput.files[0]);
+                }
+
+                try {
+                    const response = await fetch('../../addRecipe.php', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'include'
+                    });
+                    
+                    const data = await response.json();
+                    console.log('Initial submission response:', data); // Debug log
+                    
+                    if (data.warning && data.poisonous) {
+                        const modal = document.getElementById('warningModal');
+                        const warningMessage = document.getElementById('warningMessage');
+                        warningMessage.textContent = data.message;
+                        modal.style.display = 'flex';
+                        
+                        // edit button
+                        document.getElementById('editRecipe').onclick = function() {
+                            modal.style.display = 'none';
+                            document.getElementById('ingredient').focus();
+                            document.getElementById('ingredient').style.borderColor = '#dc3545';
+                        };
+                        
+                        // continue anyway button
+                        document.getElementById('continueAnyway').onclick = async function() {
+                            try {
+                                const formData = new FormData(form);
+                                formData.append('override_warning', 'true');
+
+                                // Add the image if one was selected
+                                if (imageInput.files.length > 0) {
+                                    formData.append('recipe-image', imageInput.files[0]);
+                                }
+
+                                //console.log('Sending override request...'); 
+
+                                const finalResponse = await fetch('../../addRecipe.php', {
+                                    method: 'POST',
+                                    body: formData,
+                                    credentials: 'include'
+                                });
+
+                                //console.log('Response status:', finalResponse.status)
+
+                                const finalData = await finalResponse.json();
+                                //console.log('Override response:', finalData); 
+
+                                if (finalData.success) {
+                                    modal.style.display = 'none';
+                                    showToast('Recipe submitted for admin review', 'success');
+                                    setTimeout(() => {
+                                        if (finalData.isAdmin) {
+                                            window.location.href = 'poisonousRecipes.html';
+                                        } else {
+                                            window.location.href = 'profile.html';
+                                        }
+                                    }, 2500);
+                                } else {
+                                    throw new Error(finalData.message || 'Failed to submit recipe');
+                                }
+                            } catch (error) {
+                                console.error('Error in continue anyway:', error);
+                                showToast(error.message || 'Error submitting recipe', 'error');
+                            }
+                        };
+                    } else if (data.success) {
+                        showToast('Recipe added successfully!', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'profile.html';
+                        }, 1500);
+                    } else {
+                        showToast(data.message || 'Error adding recipe', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error in form submission:', error);
+                    showToast(error.message || 'An error occurred', 'error');
+                }
+            });
+        }
+
+        function previewImage(input) {
+            const label = document.getElementById('image-label');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('preview').src = e.target.result; // Set the preview image
+                    if (label) {
+                        label.classList.add('hidden');
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                // Reset to default state if no file is selected
+                if (label) {
+                    label.classList.remove('hidden'); // Remove 'hidden' class to show the label
+                }
+                document.getElementById('preview').src = '../image/addimg.png'; // Reset to default image
+            }
+        }
+        
+        document.getElementById('image-upload').addEventListener('change', function() {
+            previewImage(this);
+        });
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            if (!toast) {
+                // Create toast element if it doesn't exist
+                const newToast = document.createElement('div');
+                newToast.id = 'toast';
+                document.body.appendChild(newToast);
+            }
+            const toastElement = document.getElementById('toast');
+            toastElement.textContent = message;
+            toastElement.className = `toast ${type}`;
+            toastElement.style.display = 'block';
+            setTimeout(() => {
+                toastElement.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+    <div id="toast" class="toast"></div>
+</body>
+</html>
